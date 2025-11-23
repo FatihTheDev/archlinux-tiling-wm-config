@@ -10,7 +10,7 @@ sudo pacman -Syu --noconfirm
 
 echo "[2/15] Installing essential packages..."
 sudo pacman -S --noconfirm hyprland swaybg hyprlock hypridle waybar wofi grim slurp wl-clipboard xorg-xwayland \
-    xorg-xhost alacritty librewolf brave pamac neovim localsend \
+    xorg-xhost alacritty waterfox brave pamac neovim localsend \
     network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
     nwg-look nwg-clipman ristretto thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar \
@@ -118,28 +118,81 @@ bash /tmp/templates.sh
 rm -f /tmp/templates.sh
 
 # ----------------------------------------
-# Enabling profiles and disabling "delete cookies and site data when Librewolf is closed" setting for LibreWolf browser
+# Hardening Waterfox
 # ----------------------------------------
-mkdir -p ~/.librewolf
+# 1. Define paths
+WF_PATH="/opt/waterfox"
+CFG_PATH="$WF_PATH/waterfox.cfg"
 
-# Define autoconfig file path
-OVERRIDES_FILE="$HOME/.librewolf/librewolf.overrides.cfg"
+# 2. Create main config file inside installation
+sudo tee "$CFG_PATH" > /dev/null <<'EOF'
+//
+// ==================================================================
+// Waterfox Global Privacy + Security Configuration for all profiles
+// ==================================================================
+//
+// ----------- Fingerprinting protection ---------------
+pref("privacy.resistFingerprinting", true);
 
-# Create overrides config
-cat > "$OVERRIDES_FILE" << 'EOF'
-// you can change these manually by editing them in about:config
-pref("browser.profiles.enabled", true);
-pref("browser.profiles.created", true);
-pref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
+// ----------- HTTPS-Only mode -------------------------
+// Normal windows: false
+pref("dom.security.https_only_mode", false);
+// Private windows: true
+pref("dom.security.https_only_mode_pbm", true);
+
+// ----------- Tracking protection ----------------------
+pref("browser.contentblocking.category", "strict");
+
+// ----------- Geolocation (ask, no system providers) -----
+pref("geo.enabled", true);
+lockPref("geo.provider.use_gpsd", false);
+lockPref("geo.provider.use_geoclue", false);
+lockPref("permissions.default.geo", 0);  // 0=ask
+lockPref("geo.provider.ms-windows-location", false);
+lockPref("geo.provider.use_windows_location_service", false);
+
+// ----------- Disable telemetry / data collection -----
+lockPref("datareporting.healthreport.uploadEnabled", false);
+lockPref("datareporting.policy.dataSubmissionEnabled", false);
+lockPref("toolkit.telemetry.enabled", false);
+lockPref("toolkit.telemetry.unified", false);
+lockPref("toolkit.telemetry.server", "");
+lockPref("experiments.enabled", false);
+lockPref("browser.ping-centre.telemetry", false);
+
+// ----------- Password saving -------------------------
+// Disable the "ask to save passwords" prompt
+pref("signon.rememberSignons", false);
+
+// ----------- Disable payment methods & autofill -------
+pref("dom.payments.enabled", false);
+pref("extensions.formautofill.creditCards.enabled", false);
+pref("extensions.formautofill.addresses.enabled", false);
+
+// ----------- Disable Pocket ---------------------------
+lockPref("extensions.pocket.enabled", false);
+
+// ----------- WebRTC (toggleable) ---------------------
+pref("media.peerconnection.enabled", false);
+
+// ----------- Enable ECH (encrypted client hello - makes it harder for ISP to see domain you're connecting to) ---------------------
+pref("network.dns.echconfig.enabled", true);
+pref("security.tls.ech.grease_http3", true);
 EOF
 
-# Ensure autoconfig is loaded
-sudo mkdir -p /usr/lib/librewolf/defaults/pref
-sudo tee /usr/lib/librewolf/defaults/pref/autoconfig.js > /dev/null << 'EOF'
-pref("autoadmin.global_config_url", "file://$HOME/.librewolf/librewolf.overrides.cfg");
+echo "[+] Created $CFG_PATH"
+
+# 3. Ensure autoconfig loads it
+sudo mkdir -p "$WF_PATH/defaults/pref"
+
+sudo tee "$WF_PATH/defaults/pref/autoconfig.js" > /dev/null << 'EOF'
+pref("general.config.filename", "waterfox.cfg");
+pref("general.config.obscure_value", 0);
 EOF
 
-echo "LibreWolf profile and cookie settings configured."
+echo "[+] Created $WF_PATH/defaults/pref/autoconfig.js"
+
+echo "✅ Waterfox has been hardened with the configuration."
 
 # -----------------------
 # Audio system selection
