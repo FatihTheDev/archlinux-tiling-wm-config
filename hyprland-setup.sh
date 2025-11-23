@@ -130,8 +130,7 @@ cat > "$OVERRIDES_FILE" << 'EOF'
 // you can change these manually by editing them in about:config
 pref("browser.profiles.enabled", true);
 pref("browser.profiles.created", true);
-pref("privacy.clearOnShutdown.cookies", false);
-pref("privacy.clearOnShutdown.offlineApps", false);
+pref("privacy.clearOnShutdown_v2.cookiesAndStorage");
 EOF
 
 # Ensure autoconfig is loaded
