@@ -162,7 +162,7 @@ lockPref("browser.ping-centre.telemetry", false);
 
 // ----------- Password saving -------------------------
 // Disable the "ask to save passwords" prompt
-pref("signon.rememberSignons", false);
+lockPref("signon.rememberSignons", false);
 
 // ----------- Disable payment methods & autofill -------
 pref("dom.payments.enabled", false);
