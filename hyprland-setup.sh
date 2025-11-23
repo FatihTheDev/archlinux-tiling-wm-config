@@ -117,6 +117,31 @@ EOF
 bash /tmp/templates.sh
 rm -f /tmp/templates.sh
 
+# ----------------------------------------
+# Enabling profiles and disabling "delete cookies and site data when Librewolf is closed" setting for LibreWolf browser
+# ----------------------------------------
+mkdir -p ~/.librewolf
+
+# Define autoconfig file path
+OVERRIDES_FILE="$HOME/.librewolf/librewolf.overrides.cfg"
+
+# Create overrides config
+cat > "$OVERRIDES_FILE" << 'EOF'
+// you can change these manually by editing them in about:config
+pref("browser.profiles.enabled", true);
+pref("browser.profiles.created", true);
+pref("privacy.clearOnShutdown.cookies", false);
+pref("privacy.clearOnShutdown.offlineApps", false);
+EOF
+
+# Ensure autoconfig is loaded
+sudo mkdir -p /usr/lib/librewolf/defaults/pref
+sudo tee /usr/lib/librewolf/defaults/pref/autoconfig.js > /dev/null << 'EOF'
+pref("autoadmin.global_config_url", "file://$HOME/.librewolf/librewolf.overrides.cfg");
+EOF
+
+echo "LibreWolf profile and cookie settings configured."
+
 # -----------------------
 # Audio system selection
 # -----------------------
