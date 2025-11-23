@@ -133,6 +133,7 @@ sudo tee "$CFG_PATH" > /dev/null <<'EOF'
 //
 // ----------- Fingerprinting protection ---------------
 pref("privacy.resistFingerprinting", true);
+lockPref("services.sync.prefs.sync.privacy.resistFingerprinting", false);
 
 // ----------- HTTPS-Only mode -------------------------
 // Normal windows: false
