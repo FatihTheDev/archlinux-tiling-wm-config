@@ -10,7 +10,7 @@ sudo pacman -Syu --noconfirm
 
 echo "[2/15] Installing essential packages..."
 sudo pacman -S --noconfirm hyprland swaybg hyprlock hypridle waybar wofi grim slurp wl-clipboard xorg-xwayland \
-    xorg-xhost alacritty waterfox brave pamac neovim localsend \
+    xorg-xhost alacritty floorp brave pamac neovim localsend \
     network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
     nwg-look nwg-clipman ristretto thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar \
@@ -118,41 +118,59 @@ bash /tmp/templates.sh
 rm -f /tmp/templates.sh
 
 # ----------------------------------------
-# Hardening Waterfox
+# Hardening Floorp browser
 # ----------------------------------------
 # 1. Define paths
-WF_PATH="/opt/waterfox"
-CFG_PATH="$WF_PATH/waterfox.cfg"
+FP_PATH="/usr/lib/floorp"
+CFG_PATH="$FP_PATH/floorp.cfg"
 
-# 2. Create main config file inside installation
+# 2. Create main config file
 sudo tee "$CFG_PATH" > /dev/null <<'EOF'
 //
 // ==================================================================
-// Waterfox Global Privacy + Security Configuration for all profiles
+// Floorp Global Privacy + Security Configuration
 // ==================================================================
 //
-// ----------- Fingerprinting protection ---------------
-pref("privacy.resistFingerprinting", true);
-lockPref("services.sync.prefs.sync.privacy.resistFingerprinting", false);
 
-// ----------- HTTPS-Only mode -------------------------
-// Normal windows: false
+// ----------- Fingerprinting protection (toggleable) -----------
+defaultPref("privacy.resistFingerprinting", true);
+
+// ----------- TIMEZONE & HEADER HARDENING -----------------------
+pref("privacy.resistFingerprinting.block_mozAddonManager", true);
+pref("javascript.use_us_english_locale", true);
+pref("intl.accept_languages", "en-US, en");
+pref("intl.locale.requested", "en-US");
+
+// ----------- HTTPS-Only mode ------------------------------------
 pref("dom.security.https_only_mode", false);
-// Private windows: true
 pref("dom.security.https_only_mode_pbm", true);
 
-// ----------- Tracking protection ----------------------
+// ----------- Tracking protection --------------------------------
 pref("browser.contentblocking.category", "strict");
 
-// ----------- Geolocation (ask, no system providers) -----
-pref("geo.enabled", true);
+// ----------- DNS + Cloudflare DoH + ECH -------------------------
+pref("network.trr.uri", "https://cloudflare-dns.com/dns-query");
+pref("network.trr.mode", 3); // 3 = DoH only
+pref("network.trr.bootstrapAddress", "1.1.1.1"); // fallback IP
+pref("network.dns.echconfig.enabled", true);
+pref("security.tls.ech.grease_http3", true);
+
+// ----------- WebRTC LEAK PROTECTION (fully disabled) -----------
+lockPref("media.peerconnection.enabled", false);
+lockPref("media.peerconnection.ice.default_address_only", true);
+lockPref("media.peerconnection.ice.no_host", true);
+lockPref("media.peerconnection.ice.proxy_only_if_behind_proxy", true);
+lockPref("media.peerconnection.ice.obfuscate_host_addresses", true);
+
+// ----------- Geolocation (disabled) ----------------------------
+lockPref("geo.enabled", false);
 lockPref("geo.provider.use_gpsd", false);
 lockPref("geo.provider.use_geoclue", false);
-lockPref("permissions.default.geo", 0);  // 0=ask
+lockPref("permissions.default.geo", 0);
 lockPref("geo.provider.ms-windows-location", false);
 lockPref("geo.provider.use_windows_location_service", false);
 
-// ----------- Disable telemetry / data collection -----
+// ----------- Disable telemetry & monetization -------------------
 lockPref("datareporting.healthreport.uploadEnabled", false);
 lockPref("datareporting.policy.dataSubmissionEnabled", false);
 lockPref("toolkit.telemetry.enabled", false);
@@ -160,40 +178,47 @@ lockPref("toolkit.telemetry.unified", false);
 lockPref("toolkit.telemetry.server", "");
 lockPref("experiments.enabled", false);
 lockPref("browser.ping-centre.telemetry", false);
+lockPref("browser.newtabpage.activity-stream.telemetry", false);
+lockPref("browser.newtabpage.activity-stream.feeds.telemetry", false);
 
-// ----------- Password saving -------------------------
-// Disable the "ask to save passwords" prompt
+// ----------- Disable Pocket (locked) ----------------------------
+lockPref("extensions.pocket.enabled", false);
+
+// ----------- Password saving -------------------------------------
 lockPref("signon.rememberSignons", false);
 
-// ----------- Disable payment methods & autofill -------
+// ----------- Disable search & form history ---------------------
+pref("browser.formfill.enable", false);
+pref("browser.search.suggest.enabled", false);
+pref("privacy.clearOnShutdown.formdata", true);
+
+// ----------- Disable payments + autofill ------------------------
 pref("dom.payments.enabled", false);
 pref("extensions.formautofill.creditCards.enabled", false);
 pref("extensions.formautofill.addresses.enabled", false);
 
-// ----------- Disable Pocket ---------------------------
-lockPref("extensions.pocket.enabled", false);
+// ----------- Extra leak prevention ------------------------------
+lockPref("network.http.referer.XOriginPolicy", 2);
+lockPref("device.sensors.enabled", false);
+lockPref("dom.battery.enabled", false);
 
-// ----------- WebRTC (toggleable) ---------------------
-pref("media.peerconnection.enabled", false);
-
-// ----------- Enable ECH (encrypted client hello - makes it harder for ISP to see domain you're connecting to) ---------------------
-pref("network.dns.echconfig.enabled", true);
-pref("security.tls.ech.grease_http3", true);
+// ----------- Disable WebGL --------------------------------------
+pref("webgl.disabled", true);
 EOF
 
 echo "[+] Created $CFG_PATH"
 
-# 3. Ensure autoconfig loads it
-sudo mkdir -p "$WF_PATH/defaults/pref"
+# 3. Enable autoconfig loading
+sudo mkdir -p "$FP_PATH/defaults/pref"
 
-sudo tee "$WF_PATH/defaults/pref/autoconfig.js" > /dev/null << 'EOF'
-pref("general.config.filename", "waterfox.cfg");
+sudo tee "$FP_PATH/defaults/pref/autoconfig.js" > /dev/null << 'EOF'
+pref("general.config.filename", "floorp.cfg");
 pref("general.config.obscure_value", 0);
 EOF
 
-echo "[+] Created $WF_PATH/defaults/pref/autoconfig.js"
+echo "[+] Created $FP_PATH/defaults/pref/autoconfig.js"
 
-echo "✅ Waterfox has been hardened with the configuration."
+echo "✅ Floorp hardened successfully with Cloudflare DNS"
 
 # -----------------------
 # Audio system selection
