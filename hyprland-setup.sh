@@ -184,8 +184,10 @@ lockPref("browser.newtabpage.activity-stream.feeds.telemetry", false);
 // ----------- Disable Pocket (locked) ----------------------------
 lockPref("extensions.pocket.enabled", false);
 
-// ----------- Password saving -------------------------------------
+// ----------- Disable password saving in-browser -------------------
 lockPref("signon.rememberSignons", false);
+lockPref("signon.autofillForms", false);
+lockPref("signon.autologin.proxy", false);
 
 // ----------- Disable search & form history ---------------------
 pref("browser.formfill.enable", false);
@@ -203,7 +205,7 @@ lockPref("device.sensors.enabled", false);
 lockPref("dom.battery.enabled", false);
 
 // ----------- Disable WebGL --------------------------------------
-pref("webgl.disabled", true);
+defaultPref("webgl.disabled", true);
 EOF
 
 echo "[+] Created $CFG_PATH"
@@ -218,7 +220,7 @@ EOF
 
 echo "[+] Created $FP_PATH/defaults/pref/autoconfig.js"
 
-echo "✅ Floorp hardened successfully with Cloudflare DNS"
+echo "✅ Floorp hardened successfully with Cloudflare DNS added."
 
 # -----------------------
 # Audio system selection
