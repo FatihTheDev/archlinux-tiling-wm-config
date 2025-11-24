@@ -206,6 +206,8 @@ lockPref("dom.battery.enabled", false);
 
 // ----------- Disable WebGL --------------------------------------
 defaultPref("webgl.disabled", true);
+defaultPref("webgl.enable-webgl2", true);
+defaultPref("webgl.min_capability_mode", false);
 EOF
 
 echo "[+] Created $CFG_PATH"
