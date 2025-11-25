@@ -132,7 +132,7 @@ sudo mkdir -p "$PREF_PATH"
 # 3. Create main autoconfig file
 sudo tee "$CFG_PATH" > /dev/null <<'EOF'
 // LibreWolf AutoConfig
-// This file is loaded at startup. Do not leave blank lines above this header.
+// This file is loaded at Librewolf startup. Do not leave blank lines above this header.
 
 // ----------------- Profiles + Accounts -----------------
 defaultPref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
@@ -140,13 +140,13 @@ defaultPref("browser.profiles.enabled", true);
 defaultPref("identity.fxaccounts.enabled", true);  // enables Firefox Sync UI
 
 // ----------------- Set tracker blocking to strict ---------------
-defaultPref("browser.contentblocking.category", "strict");
-defaultPref("privacy.trackingprotection.enabled", true);
-defaultPref("privacy.trackingprotection.pbmode.enabled", true);
-defaultPref("privacy.trackingprotection.socialtracking.enabled", true);
-defaultPref("privacy.trackingprotection.fingerprinting.enabled", true);
-defaultPref("privacy.trackingprotection.cryptomining.enabled", true);
-defaultPref("network.cookie.cookieBehavior", 5);
+pref("browser.contentblocking.category", "strict");
+pref("privacy.trackingprotection.enabled", true);
+pref("privacy.trackingprotection.pbmode.enabled", true);
+pref("privacy.trackingprotection.socialtracking.enabled", true);
+pref("privacy.trackingprotection.fingerprinting.enabled", true);
+pref("privacy.trackingprotection.cryptomining.enabled", true);
+pref("network.cookie.cookieBehavior", 5);
 
 // ----------------- Cookie / Storage ---------------------
 defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
