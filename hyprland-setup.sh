@@ -151,11 +151,9 @@ defaultPref("network.cookie.cookieBehavior", 5);
 // ----------------- Cookie / Storage ---------------------
 defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
 
-// ----------------- DNS + ECH ----------------------------
+// ----------------- DNS ----------------------------
 pref("network.trr.uri", "https://cloudflare-dns.com/dns-query");
 pref("network.trr.mode", 2);
-pref("network.dns.echconfig.enabled", true);
-pref("security.tls.ech.grease_http3", true);
 
 // ----------------- WebRTC Leak Protection ---------------
 pref("media.peerconnection.enabled", false);
