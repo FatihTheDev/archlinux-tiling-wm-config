@@ -141,6 +141,12 @@ defaultPref("identity.fxaccounts.enabled", true);  // enables Firefox Sync UI
 
 // ----------------- Set tracker blocking to strict ---------------
 defaultPref("browser.contentblocking.category", "strict");
+defaultPref("privacy.trackingprotection.enabled", true);
+defaultPref("privacy.trackingprotection.pbmode.enabled", true);
+defaultPref("privacy.trackingprotection.socialtracking.enabled", true);
+defaultPref("privacy.trackingprotection.fingerprinting.enabled", true);
+defaultPref("privacy.trackingprotection.cryptomining.enabled", true);
+defaultPref("network.cookie.cookieBehavior", 5);
 
 // ----------------- Cookie / Storage ---------------------
 defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
