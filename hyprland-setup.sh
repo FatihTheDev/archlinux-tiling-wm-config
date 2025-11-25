@@ -134,6 +134,9 @@ sudo tee "$CFG_PATH" > /dev/null <<'EOF'
 // LibreWolf AutoConfig
 // This file is loaded at Librewolf startup. Do not leave blank lines above this header.
 
+// ----------------- Resist Fingerprinting ---------------
+defaultPref("privacy.resistFingerprinting", true)
+
 // ----------------- Profiles + Accounts -----------------
 defaultPref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 defaultPref("browser.profiles.enabled", true);
@@ -162,13 +165,26 @@ lockPref("media.peerconnection.ice.no_host", true);
 lockPref("media.peerconnection.ice.proxy_only_if_behind_proxy", true);
 pref("media.peerconnection.ice.obfuscate_host_addresses", true);
 
+// ---------------- Disable WebGL ------------------
+defaultPref("webgl.disabled", true);
+
 // ----------------- Password Saving ----------------------
 pref("signon.rememberSignons", false);
 
-// ----------------- Disable Payments + Autofill ----------
+// ----------------- Disable Payments + Autofill ---------------
 pref("dom.payments.enabled", false);
 pref("extensions.formautofill.creditCards.enabled", false);
 pref("extensions.formautofill.addresses.enabled", false);
+
+// ----------------- Disable Google Safe Browsing -------------
+pref("browser.safebrowsing.malware.enabled", false);
+pref("browser.safebrowsing.phishing.enabled", false);
+pref("browser.safebrowsing.downloads.enabled", false);
+pref("browser.safebrowsing.downloads.remote.enabled", false);
+
+// ---------------- Enable HTTPS-only mode in private windows only ----------------
+pref("dom.security.https_only_mode", false);
+pref("dom.security.https_only_mode_pbm", true);
 
 // ----------------- Extra Leak Prevention ----------------
 lockPref("network.http.referer.XOriginPolicy", 2);
