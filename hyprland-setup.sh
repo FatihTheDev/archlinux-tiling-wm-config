@@ -10,7 +10,7 @@ sudo pacman -Syu --noconfirm
 
 echo "[2/15] Installing essential packages..."
 sudo pacman -S --noconfirm hyprland swaybg hyprlock hypridle waybar wofi grim slurp wl-clipboard xorg-xwayland \
-    xorg-xhost alacritty floorp brave pamac neovim localsend \
+    xorg-xhost alacritty librewolf brave pamac neovim localsend \
     network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
     nwg-look nwg-clipman ristretto thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar \
@@ -118,111 +118,68 @@ bash /tmp/templates.sh
 rm -f /tmp/templates.sh
 
 # ----------------------------------------
-# Hardening Floorp browser
+# Adding accounts for Librewolf browser
 # ----------------------------------------
 # 1. Define paths
-FP_PATH="/usr/lib/floorp"
-CFG_PATH="$FP_PATH/floorp.cfg"
+FP_PATH="/usr/lib/librewolf"
+CFG_PATH="$FP_PATH/librewolf.cfg"
+PREF_PATH="$FP_PATH/defaults/pref"
+ACFILE="$PREF_PATH/autoconfig.js"
 
-# 2. Create main config file
+# 2. Ensure directory exists
+sudo mkdir -p "$PREF_PATH"
+
+# 3. Create main autoconfig file
 sudo tee "$CFG_PATH" > /dev/null <<'EOF'
-//
-// ==================================================================
-// Floorp Global Privacy + Security Configuration
-// ==================================================================
-//
+// LibreWolf AutoConfig
+// This file is loaded at startup. Do not leave blank lines above this header.
 
-// ----------- Fingerprinting protection (toggleable) -----------
-defaultPref("privacy.resistFingerprinting", true);
+// ----------------- Profiles + Accounts -----------------
+defaultPref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+defaultPref("browser.profiles.enabled", true);
+defaultPref("identity.fxaccounts.enabled", true);  // enables Firefox Sync UI
 
-// ----------- TIMEZONE & HEADER HARDENING -----------------------
-pref("privacy.resistFingerprinting.block_mozAddonManager", true);
-pref("javascript.use_us_english_locale", true);
-pref("intl.accept_languages", "en-US, en");
-pref("intl.locale.requested", "en-US");
+// ----------------- Cookie / Storage ---------------------
+defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
 
-// ----------- HTTPS-Only mode ------------------------------------
-pref("dom.security.https_only_mode", false);
-pref("dom.security.https_only_mode_pbm", true);
-
-// ----------- Tracking protection --------------------------------
-pref("browser.contentblocking.category", "strict");
-
-// ----------- DNS + Cloudflare DoH + ECH -------------------------
+// ----------------- DNS + ECH ----------------------------
 pref("network.trr.uri", "https://cloudflare-dns.com/dns-query");
-pref("network.trr.mode", 3); // 3 = DoH only
-pref("network.trr.bootstrapAddress", "1.1.1.1"); // fallback IP
+pref("network.trr.mode", 2);
 pref("network.dns.echconfig.enabled", true);
 pref("security.tls.ech.grease_http3", true);
 
-// ----------- WebRTC LEAK PROTECTION (fully disabled) -----------
-lockPref("media.peerconnection.enabled", false);
+// ----------------- WebRTC Leak Protection ---------------
+pref("media.peerconnection.enabled", false);
 lockPref("media.peerconnection.ice.default_address_only", true);
 lockPref("media.peerconnection.ice.no_host", true);
 lockPref("media.peerconnection.ice.proxy_only_if_behind_proxy", true);
-lockPref("media.peerconnection.ice.obfuscate_host_addresses", true);
+pref("media.peerconnection.ice.obfuscate_host_addresses", true);
 
-// ----------- Geolocation (disabled) ----------------------------
-lockPref("geo.enabled", false);
-lockPref("geo.provider.use_gpsd", false);
-lockPref("geo.provider.use_geoclue", false);
-lockPref("permissions.default.geo", 0);
-lockPref("geo.provider.ms-windows-location", false);
-lockPref("geo.provider.use_windows_location_service", false);
+// ----------------- Password Saving ----------------------
+pref("signon.rememberSignons", false);
 
-// ----------- Disable telemetry & monetization -------------------
-lockPref("datareporting.healthreport.uploadEnabled", false);
-lockPref("datareporting.policy.dataSubmissionEnabled", false);
-lockPref("toolkit.telemetry.enabled", false);
-lockPref("toolkit.telemetry.unified", false);
-lockPref("toolkit.telemetry.server", "");
-lockPref("experiments.enabled", false);
-lockPref("browser.ping-centre.telemetry", false);
-lockPref("browser.newtabpage.activity-stream.telemetry", false);
-lockPref("browser.newtabpage.activity-stream.feeds.telemetry", false);
-
-// ----------- Disable Pocket (locked) ----------------------------
-lockPref("extensions.pocket.enabled", false);
-
-// ----------- Disable password saving in-browser -------------------
-lockPref("signon.rememberSignons", false);
-lockPref("signon.autofillForms", false);
-lockPref("signon.autologin.proxy", false);
-
-// ----------- Disable search & form history ---------------------
-pref("browser.formfill.enable", false);
-pref("browser.search.suggest.enabled", false);
-pref("privacy.clearOnShutdown.formdata", true);
-
-// ----------- Disable payments + autofill ------------------------
+// ----------------- Disable Payments + Autofill ----------
 pref("dom.payments.enabled", false);
 pref("extensions.formautofill.creditCards.enabled", false);
 pref("extensions.formautofill.addresses.enabled", false);
 
-// ----------- Extra leak prevention ------------------------------
+// ----------------- Extra Leak Prevention ----------------
 lockPref("network.http.referer.XOriginPolicy", 2);
 lockPref("device.sensors.enabled", false);
 lockPref("dom.battery.enabled", false);
-
-// ----------- Disable WebGL --------------------------------------
-defaultPref("webgl.disabled", true);
-defaultPref("webgl.enable-webgl2", true);
-defaultPref("webgl.min_capability_mode", false);
 EOF
 
 echo "[+] Created $CFG_PATH"
 
-# 3. Enable autoconfig loading
-sudo mkdir -p "$FP_PATH/defaults/pref"
-
-sudo tee "$FP_PATH/defaults/pref/autoconfig.js" > /dev/null << 'EOF'
-pref("general.config.filename", "floorp.cfg");
+# 4. Create autoconfig loader
+sudo tee "$ACFILE" > /dev/null <<'EOF'
+pref("general.config.filename", "librewolf.cfg");
 pref("general.config.obscure_value", 0);
 EOF
 
-echo "[+] Created $FP_PATH/defaults/pref/autoconfig.js"
+echo "[+] Created $ACFILE"
 
-echo "✅ Floorp hardened successfully with Cloudflare DNS added."
+echo "✅ LibreWolf autoconfig successfully installed"
 
 # -----------------------
 # Audio system selection
@@ -265,33 +222,33 @@ fi
 
 # Create fallback .desktop files (only if missing)
 
-# AUR Package Search (through Floorp)
-if [[ ! -f ~/.local/share/applications/floorp-AUR_Package_Search.desktop ]]; then
-cat > ~/.local/share/applications/floorp-AUR_Package_Search.desktop <<'EOF'
+# AUR Package Search (through Librewolf)
+if [[ ! -f ~/.local/share/applications/librewolf-AUR_Package_Search.desktop ]]; then
+cat > ~/.local/share/applications/librewolf-AUR_Package_Search.desktop <<'EOF'
 #!/usr/bin/env xdg-open
 [Desktop Entry]
 Version=1.0
 Type=Application
 Name=AUR Package Search
-Exec=/usr/bin/floorp "https://aur.archlinux.org/packages?O=0&K="
+Exec=/usr/bin/librewolf "https://aur.archlinux.org/packages?O=0&K="
 Icon=applications-internet
 URL=https://aur.archlinux.org/packages?O=0&K=
-Comment=Open https://aur.archlinux.org/packages?O=0&K= in a new tab in Floorp.
+Comment=Open https://aur.archlinux.org/packages?O=0&K= in a new tab in Librewolf.
 EOF
 fi
 
-# Chaotic AUR Package Search (through Floorp)
-if [[ ! -f ~/.local/share/applications/floorp-Chaotic_AUR_Package_Search.desktop ]]; then
-cat > ~/.local/share/applications/floorp-Chaotic_AUR_Package_Search.desktop <<'EOF'
+# Chaotic AUR Package Search (through Librewolf)
+if [[ ! -f ~/.local/share/applications/librewolf-Chaotic_AUR_Package_Search.desktop ]]; then
+cat > ~/.local/share/applications/librewolf-Chaotic_AUR_Package_Search.desktop <<'EOF'
 #!/usr/bin/env xdg-open
 [Desktop Entry]
 Version=1.0
 Type=Application
 Name=Chaotic AUR Package Search
-Exec=/usr/bin/floorp "https://aur.chaotic.cx/packages"
+Exec=/usr/bin/librewolf "https://aur.chaotic.cx/packages"
 Icon=applications-internet
 URL=https://aur.chaotic.cx/packages
-Comment=Open https://aur.chaotic.cx/packages in a new tab in Floorp.
+Comment=Open https://aur.chaotic.cx/packages in a new tab in Librewolf.
 EOF
 fi
 
