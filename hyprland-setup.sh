@@ -157,6 +157,7 @@ defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
 // ----------------- DNS ----------------------------
 pref("network.trr.uri", "https://cloudflare-dns.com/dns-query");
 pref("network.trr.mode", 2);
+defaultPref("network.trr.bootstrapAddress", "1.1.1.1");
 
 // ----------------- WebRTC Leak Protection ---------------
 pref("media.peerconnection.enabled", false);
