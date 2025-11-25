@@ -139,6 +139,9 @@ defaultPref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 defaultPref("browser.profiles.enabled", true);
 defaultPref("identity.fxaccounts.enabled", true);  // enables Firefox Sync UI
 
+// ----------------- Set tracker blocking to strict ---------------
+defaultPref("browser.contentblocking.category", "strict");
+
 // ----------------- Cookie / Storage ---------------------
 defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
 
