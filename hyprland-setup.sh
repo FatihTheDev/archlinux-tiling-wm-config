@@ -135,6 +135,7 @@ sudo tee "$CFG_PATH" > /dev/null <<'EOF'
 // This file is loaded at Librewolf startup. Do not leave blank lines above this header.
 
 // ----------------- Additional fingerprinting protection ----------------
+defaultPref("privacy.resistFingerprinting", true);
 lockPref("general.buildID.override", "20200101000000");
 lockPref("browser.startup.homepage_override.buildID", "20200101000000");
 lockPref("dom.gamepad.enabled", false);
