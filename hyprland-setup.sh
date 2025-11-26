@@ -147,8 +147,6 @@ lockPref("dom.maxHardwareConcurrency.workerCount", 2);
 lockPref("network.http.referer.XOriginPolicy", 2);
 lockPref("device.sensors.enabled", false);
 lockPref("dom.battery.enabled", false);
-// disable audio fingerprinting
-pref("dom.webaudio.enabled", false);
 
 // ----------------- Profiles + Accounts -----------------
 defaultPref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
