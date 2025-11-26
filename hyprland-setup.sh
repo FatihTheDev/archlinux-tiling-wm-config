@@ -134,8 +134,21 @@ sudo tee "$CFG_PATH" > /dev/null <<'EOF'
 // LibreWolf AutoConfig
 // This file is loaded at Librewolf startup. Do not leave blank lines above this header.
 
-// ----------------- Resist Fingerprinting ---------------
-defaultPref("privacy.resistFingerprinting", true)
+// ----------------- Additional fingerprinting protection ----------------
+lockPref("general.buildID.override", "20200101000000");
+lockPref("browser.startup.homepage_override.buildID", "20200101000000");
+lockPref("dom.gamepad.enabled", false);
+lockPref("dom.netinfo.enabled", false);
+lockPref("dom.enable_performance", false);
+lockPref("dom.telephony.enabled", false);
+lockPref("dom.vibrator.enabled", false);
+lockPref("dom.maxHardwareConcurrency", 2);
+lockPref("dom.maxHardwareConcurrency.workerCount", 2);
+lockPref("network.http.referer.XOriginPolicy", 2);
+lockPref("device.sensors.enabled", false);
+lockPref("dom.battery.enabled", false);
+// disable audio fingerprinting
+pref("dom.webaudio.enabled", false);
 
 // ----------------- Profiles + Accounts -----------------
 defaultPref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
@@ -160,7 +173,6 @@ pref("network.trr.mode", 2);
 defaultPref("network.trr.bootstrapAddress", "1.1.1.1");
 
 // ----------------- WebRTC Leak Protection ---------------
-pref("media.peerconnection.enabled", false);
 lockPref("media.peerconnection.ice.default_address_only", true);
 lockPref("media.peerconnection.ice.no_host", true);
 lockPref("media.peerconnection.ice.proxy_only_if_behind_proxy", true);
@@ -177,20 +189,11 @@ pref("dom.payments.enabled", false);
 pref("extensions.formautofill.creditCards.enabled", false);
 pref("extensions.formautofill.addresses.enabled", false);
 
-// ----------------- Disable Google Safe Browsing -------------
-pref("browser.safebrowsing.malware.enabled", false);
-pref("browser.safebrowsing.phishing.enabled", false);
-pref("browser.safebrowsing.downloads.enabled", false);
-pref("browser.safebrowsing.downloads.remote.enabled", false);
-
 // ---------------- Enable HTTPS-only mode in private windows only ----------------
 pref("dom.security.https_only_mode", false);
 pref("dom.security.https_only_mode_pbm", true);
 
 // ----------------- Extra Leak Prevention ----------------
-lockPref("network.http.referer.XOriginPolicy", 2);
-lockPref("device.sensors.enabled", false);
-lockPref("dom.battery.enabled", false);
 EOF
 
 echo "[+] Created $CFG_PATH"
