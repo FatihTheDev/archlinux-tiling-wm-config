@@ -134,17 +134,17 @@ sudo tee "$CFG_PATH" > /dev/null <<'EOF'
 // LibreWolf AutoConfig
 // This file is loaded at Librewolf startup. Do not leave blank lines above this header.
 
-// ----------------- Additional fingerprinting protection ----------------
-defaultPref("privacy.resistFingerprinting", true);
+// ----------------- Fingerprinting protection (granular control) ----------------
+defaultPref("privacy.resistFingerprinting", false);
+defaultPref("privacy.fingerprintingProtection", true);
+defaultPref("privacy.fingerprintingProtection.overrides", "+AllTargets,-CSSPrefersColorScheme");   
 lockPref("general.buildID.override", "20200101000000");
 lockPref("browser.startup.homepage_override.buildID", "20200101000000");
 lockPref("dom.gamepad.enabled", false);
 lockPref("dom.netinfo.enabled", false);
-lockPref("dom.enable_performance", false);
+// lockPref("dom.enable_performance", false);
 lockPref("dom.telephony.enabled", false);
 lockPref("dom.vibrator.enabled", false);
-lockPref("dom.maxHardwareConcurrency", 2);
-lockPref("dom.maxHardwareConcurrency.workerCount", 2);
 lockPref("network.http.referer.XOriginPolicy", 2);
 lockPref("device.sensors.enabled", false);
 lockPref("dom.battery.enabled", false);
@@ -161,7 +161,6 @@ pref("privacy.trackingprotection.pbmode.enabled", true);
 pref("privacy.trackingprotection.socialtracking.enabled", true);
 pref("privacy.trackingprotection.fingerprinting.enabled", true);
 pref("privacy.trackingprotection.cryptomining.enabled", true);
-pref("network.cookie.cookieBehavior", 5);
 
 // ----------------- Cookie / Storage ---------------------
 defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
@@ -182,6 +181,9 @@ defaultPref("webgl.disabled", true);
 
 // ----------------- Password Saving ----------------------
 pref("signon.rememberSignons", false);
+
+// ----------------- Disable saving search and form history ---------------
+defaultPref("browser.formfill.enable", false);
 
 // ----------------- Disable Payments + Autofill ---------------
 pref("dom.payments.enabled", false);
