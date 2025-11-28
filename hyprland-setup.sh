@@ -138,8 +138,6 @@ sudo tee "$CFG_PATH" > /dev/null <<'EOF'
 defaultPref("privacy.resistFingerprinting", false);
 defaultPref("privacy.fingerprintingProtection", true);
 defaultPref("privacy.fingerprintingProtection.overrides", "+AllTargets,-CSSPrefersColorScheme");   
-lockPref("general.buildID.override", "20200101000000");
-lockPref("browser.startup.homepage_override.buildID", "20200101000000");
 lockPref("dom.gamepad.enabled", false);
 lockPref("dom.netinfo.enabled", false);
 // lockPref("dom.enable_performance", false);
@@ -164,6 +162,10 @@ pref("privacy.trackingprotection.cryptomining.enabled", true);
 
 // ----------------- Cookie / Storage ---------------------
 defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
+defaultPref("privacy.sanitize.sanitizeOnShutdown", false);
+defaultPref("privacy.clearOnShutdown.cookies", false);
+defaultPref("privacy.clearOnShutdown.offlineApps", false);
+defaultPref("privacy.clearOnShutdown.cache", false);
 
 // ----------------- DNS ----------------------------
 pref("network.trr.uri", "https://cloudflare-dns.com/dns-query");
@@ -171,9 +173,7 @@ pref("network.trr.mode", 2);
 defaultPref("network.trr.bootstrapAddress", "1.1.1.1");
 
 // ----------------- WebRTC Leak Protection ---------------
-lockPref("media.peerconnection.ice.default_address_only", true);
-lockPref("media.peerconnection.ice.no_host", true);
-lockPref("media.peerconnection.ice.proxy_only_if_behind_proxy", true);
+defaultPref("media.peerconnection.enabled", true);
 pref("media.peerconnection.ice.obfuscate_host_addresses", true);
 
 // ---------------- Disable WebGL ------------------
@@ -193,8 +193,6 @@ pref("extensions.formautofill.addresses.enabled", false);
 // ---------------- Enable HTTPS-only mode in private windows only ----------------
 pref("dom.security.https_only_mode", false);
 pref("dom.security.https_only_mode_pbm", true);
-
-// ----------------- Extra Leak Prevention ----------------
 EOF
 
 echo "[+] Created $CFG_PATH"
