@@ -10,7 +10,7 @@ sudo pacman -Syu --noconfirm
 
 echo "[2/15] Installing essential packages..."
 sudo pacman -S --noconfirm hyprland swaybg hyprlock hypridle waybar wofi grim slurp wl-clipboard xorg-xwayland \
-    xorg-xhost alacritty librewolf brave pamac neovim localsend \
+    xorg-xhost alacritty librewolf pamac neovim localsend \
     network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
     nwg-look nwg-clipman ristretto thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar \
@@ -151,6 +151,10 @@ lockPref("network.http.referer.XOriginPolicy", 2);
 defaultPref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 defaultPref("browser.profiles.enabled", true);
 defaultPref("identity.fxaccounts.enabled", true);  // enables Firefox Sync UI
+
+// ----------------- Set new tab page to blank instead of homepage ----------------
+defaultPref("browser.newtabpage.enabled", false);
+defaultPref("browser.startup.homepage", "about:blank");
 
 // ----------------- Set tracker blocking to strict ---------------
 pref("browser.contentblocking.category", "strict");
