@@ -160,6 +160,12 @@ pref("privacy.trackingprotection.socialtracking.enabled", true);
 pref("privacy.trackingprotection.fingerprinting.enabled", true);
 pref("privacy.trackingprotection.cryptomining.enabled", true);
 
+// ---------------- Disable Google Safe Browsing -----------------
+defaultPref("browser.safebrowsing.malware.enabled", false);
+defaultPref("browser.safebrowsing.phishing.enabled", false);
+defaultPref("browser.safebrowsing.blockedURIs.enabled", false);
+defaultPref("browser.safebrowsing.downloads.enabled", false);
+
 // ----------------- Cookie / Storage ---------------------
 defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
 defaultPref("privacy.sanitize.sanitizeOnShutdown", false);
