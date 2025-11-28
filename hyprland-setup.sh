@@ -143,9 +143,9 @@ lockPref("dom.netinfo.enabled", false);
 // lockPref("dom.enable_performance", false);
 lockPref("dom.telephony.enabled", false);
 lockPref("dom.vibrator.enabled", false);
-lockPref("network.http.referer.XOriginPolicy", 2);
 lockPref("device.sensors.enabled", false);
 lockPref("dom.battery.enabled", false);
+lockPref("network.http.referer.XOriginPolicy", 2);
 
 // ----------------- Profiles + Accounts -----------------
 defaultPref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
@@ -176,8 +176,8 @@ defaultPref("network.trr.bootstrapAddress", "1.1.1.1");
 defaultPref("media.peerconnection.enabled", true);
 pref("media.peerconnection.ice.obfuscate_host_addresses", true);
 
-// ---------------- Disable WebGL ------------------
-defaultPref("webgl.disabled", true);
+// ---------------- Enable WebGL (to not break 3D sites, but still togglable) ------------------
+defaultPref("webgl.disabled", false);
 
 // ----------------- Password Saving ----------------------
 pref("signon.rememberSignons", false);
