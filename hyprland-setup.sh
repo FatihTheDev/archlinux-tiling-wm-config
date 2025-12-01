@@ -178,7 +178,7 @@ defaultPref("privacy.clearOnShutdown.offlineApps", false);
 defaultPref("privacy.clearOnShutdown.cache", false);
 
 // ----------------- DNS ----------------------------
-pref("network.trr.uri", "https://cloudflare-dns.com/dns-query");
+pref("network.trr.uri", "https://security.cloudflare-dns.com/dns-query");
 pref("network.trr.mode", 2);
 defaultPref("network.trr.bootstrapAddress", "1.1.1.1");
 
