@@ -10,7 +10,7 @@ sudo pacman -Syu --noconfirm
 
 echo "[2/15] Installing essential packages..."
 sudo pacman -S --noconfirm hyprland swaybg hyprlock hypridle waybar wofi grim slurp wl-clipboard xorg-xwayland \
-    xorg-xhost alacritty librewolf pamac neovim localsend \
+    xorg-xhost alacritty librewolf pamac neovim localsend jami-qt proton-vpn-gtk-app \
     network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
     nwg-look nwg-clipman ristretto thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar \
@@ -1467,6 +1467,10 @@ exec-once = gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 exec-once = gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
 exec-once = gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 exec-once = systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
+# Uncomment line below to run Jami messaging app in background on system start
+# exec-once = jami -m
+# Uncomment line below to run Proton VPN in background on system start
+# exec-once = protonvpn-app --start-minimized
 
 # ================================
 # ENVIRONMENT VARIABLES
