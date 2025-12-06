@@ -7,7 +7,7 @@ Credit for wallpapers:
 ---
 - Coffee-bean Wallpaper: Photo by <a href="https://unsplash.com/@thomas_murphy?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Thomas Murphy</a> on <a href="https://unsplash.com/photos/a-pile-of-coffee-beans-sitting-on-top-of-a-table-r9gqgwgcoiM?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
 
-- Aurora Wallpaper : Photo by <a href="https://unsplash.com/@marceloquinan?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Marcelo Quinan</a> on <a href="https://unsplash.com/photos/northern-lights-during-night-time-R3pUGn5YiTg?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+- Aurora Wallpaper : Photo by <a href="https://unsplash.com/@yang121?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Yang Xi</a> on <a href="https://unsplash.com/photos/landscape-photography-of-aurora-lights-Fpa9vFc7kXM?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
       
 
 - Mountain Wallpaper: [Mountain Wallpaper](https://www.wallpaperalchemy.com/arch-linux/wallpapers)
