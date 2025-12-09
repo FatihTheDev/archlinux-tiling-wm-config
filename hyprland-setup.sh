@@ -225,14 +225,14 @@ echo "✅ LibreWolf autoconfig successfully installed"
 DEST_DIR="$HOME/Pictures/Wallpapers"
 mkdir -p "$DEST_DIR"
 
-# List of image URLs
+# List of raw image URLs
 IMAGES=(
-    "https://raw.githubusercontent.com/username/repo/branch/path/to/image1.jpg"
-    "https://raw.githubusercontent.com/username/repo/branch/path/to/image2.png"
-    "https://raw.githubusercontent.com/username/repo/branch/path/to/image3.jpg"
+    "https://raw.githubusercontent.com/FatihTheDev/archlinux-tiling-wm-config/main/recommended_wallpapers/aurora.jpg"
+    "https://raw.githubusercontent.com/FatihTheDev/archlinux-tiling-wm-config/main/recommended_wallpapers/coffee-beans.jpg"
+    "https://raw.githubusercontent.com/FatihTheDev/archlinux-tiling-wm-config/main/recommended_wallpapers/dragon.jpg"
 )
 
-# Loop through the URLs and download each image
+# Download each image
 for URL in "${IMAGES[@]}"; do
     curl -L "$URL" -o "$DEST_DIR/$(basename $URL)"
 done
