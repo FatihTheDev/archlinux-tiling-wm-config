@@ -1240,6 +1240,13 @@ chmod +x ~/.local/bin/power-profiles.sh
 cat > ~/.local/bin/theme-switcher.sh <<'EOF'
 #!/bin/bash
 
+# --- Toggle Wofi ---
+if pgrep -x wofi >/dev/null; then
+    # Wofi is already open → close it
+    pkill -x wofi
+    exit 0
+fi
+
 WAYBAR_CSS="$HOME/.config/waybar/style.css"
 WOFI_CSS="$HOME/.config/wofi/style.css"
 HYPR_CONF="$HOME/.config/hypr/hyprland.conf"
