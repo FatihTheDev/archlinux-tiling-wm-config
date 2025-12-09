@@ -13,7 +13,7 @@ sudo pacman -S --noconfirm hyprland swaybg hyprlock hypridle waybar wofi grim sl
     xorg-xhost alacritty librewolf pamac neovim localsend jami-qt proton-vpn-gtk-app obs-studio v4l2loopback-dkms obs-vaapi \
     network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
-    nwg-look nwg-clipman qimgv thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar \
+    nwg-look nwg-clipman qimgv thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar udiskie \
     playerctl swaync swayosd libnotify inotify-tools brightnessctl polkit-gnome power-profiles-daemon \
     lxtask mate-calc gsimplecal gammastep cliphist gnome-font-viewer mousepad autotiling || true
 
@@ -1517,6 +1517,7 @@ exec-once = wl-paste --type text --watch cliphist store
 exec-once = wl-paste --type image --watch cliphist store
 exec-once = nm-applet --indicator
 exec-once = sleep 2 && waybar
+exec-once = udiskie
 exec-once = swaync
 exec-once = swayosd-server -s ~/.config/swayosd/style.css
 exec-once = gammastep -O 1510
