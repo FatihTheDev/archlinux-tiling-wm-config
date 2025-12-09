@@ -318,9 +318,9 @@ cat > "$MIMEFILE" <<'EOF'
 text/plain=org.xfce.mousepad.desktop
 text/x-markdown=nvim.desktop
 application/x-shellscript=nvim.desktop
-text/html=brave-browser.desktop
-x-scheme-handler/http=brave-browser.desktop
-x-scheme-handler/https=brave-browser.desktop
+text/html=librewolf.desktop
+x-scheme-handler/http=librewolf.desktop
+x-scheme-handler/https=librewolf.desktop
 application/pdf=masterpdfeditor4.desktop
 image/png=org.xfce.qimgv.desktop
 image/jpeg=org.xfce.qimgv.desktop
@@ -328,12 +328,12 @@ image/jpg=org.xfce.qimgv.desktop
 image/gif=org.xfce.qimgv.desktop
 image/bmp=org.xfce.qimgv.desktop
 image/webp=org.xfce.qimgv.desktop
-image/svg+xml=brave-browser.desktop
+image/svg+xml=librewolf.desktop
 x-scheme-handler/terminal=Alacritty.desktop
-application/xhtml+xml=brave-browser.desktop
-text/xml=brave-browser.desktop
-application/rss+xml=brave-browser.desktop
-application/atom+xml=brave-browser.desktop
+application/xhtml+xml=librewolf.desktop
+text/xml=librewolf.desktop
+application/rss+xml=librewolf.desktop
+application/atom+xml=librewolf.desktop
 text/x-c=nvim.desktop
 text/x-c++=nvim.desktop
 text/x-python=nvim.desktop
@@ -353,13 +353,13 @@ xdg-mime default org.xfce.qimgv.desktop image/png image/jpeg image/jpg image/bmp
 # Default file manager -> Thunar
 xdg-mime default thunar.desktop inode/directory
 
-# Browser stuff → Brave
-xdg-mime default brave-browser.desktop text/html || true
-xdg-mime default brave-browser.desktop application/xhtml+xml || true
-xdg-mime default brave-browser.desktop image/svg+xml || true
-xdg-mime default brave-browser.desktop text/xml || true
-xdg-mime default brave-browser.desktop application/rss+xml || true
-xdg-mime default brave-browser.desktop application/atom+xml || true
+# Browser stuff → Librewolf
+xdg-mime default librewolf.desktop text/html || true
+xdg-mime default librewolf.desktop application/xhtml+xml || true
+xdg-mime default librewolf.desktop image/svg+xml || true
+xdg-mime default librewolf.desktop text/xml || true
+xdg-mime default librewolf.desktop application/rss+xml || true
+xdg-mime default librewolf.desktop application/atom+xml || true
 
 # Pdf editor and viewer
 xdg-mime default masterpdfeditor4.desktop application/pdf || true
@@ -382,7 +382,7 @@ xdg-mime default nvim.desktop text/markdown || true
 xdg-mime default org.xfce.mousepad.desktop text/plain || true
 
 # Export env vars once (avoid duplicates)
-grep -qxF 'export BROWSER=brave' ~/.profile 2>/dev/null || echo 'export BROWSER=brave' >> ~/.profile
+grep -qxF 'export BROWSER=librewolf' ~/.profile 2>/dev/null || echo 'export BROWSER=librewolf' >> ~/.profile
 grep -qxF 'export TERMINAL=alacritty' ~/.profile 2>/dev/null || echo 'export TERMINAL=alacritty' >> ~/.profile
 grep -qxF 'export DOCUMENT_VIEWER=masterpdfeditor4' ~/.profile 2>/dev/null || echo 'export DOCUMENT_VIEWER=masterpdfeditor4' >> ~/.profile
 
@@ -1225,6 +1225,12 @@ WOFI_CSS="$HOME/.config/wofi/style.css"
 HYPR_CONF="$HOME/.config/hypr/hyprland.conf"
 SWAYOSD_CSS="$HOME/.config/swayosd/style.css"
 
+DEFAULT_WALLPAPER_TELVA="$HOME/Pictures/Wallpapers/coffee-beans.jpg"
+DEFAULT_WALLPAPER_MATRIX="$HOME/Pictures/Wallpapers/aurora.jpg"
+DEFAULT_WALLPAPER_DEFAULT="$HOME/Pictures/Wallpapers/dragon.jpg"
+LAST_WALLPAPER="$HOME/.cache/lastwallpaper"
+
+
 ZSH_SYNTAX_FILE="$HOME/.config/zsh_syntax_theme"
 
 THEME_FILE="$HOME/.config/current_theme"
@@ -1296,14 +1302,37 @@ set_zsh_syntax_color_file() {
     local color="$1" 
     cat > "$ZSH_SYNTAX_FILE" <<EOT
     ZSH_HIGHLIGHT_STYLES[command]='fg=$color'
-	ZSH_HIGHLIGHT_STYLES[precommand]='fg=$color'
-	ZSH_HIGHLIGHT_STYLES[builtin]='fg=$color'
+    ZSH_HIGHLIGHT_STYLES[precommand]='fg=$color'
+    ZSH_HIGHLIGHT_STYLES[builtin]='fg=$color'
     ZSH_HIGHLIGHT_STYLES[path]='fg=$color,underline'
-	ZSH_HIGHLIGHT_STYLES[path_prefix]='fg=$color'
+    ZSH_HIGHLIGHT_STYLES[path_prefix]='fg=$color'
     ZSH_HIGHLIGHT_STYLES[alias]='fg=$color'
     ZSH_HIGHLIGHT_STYLES[globbing]='fg=$color'
 EOT
 }
+
+set_theme_wallpaper() {
+    local wallpaper="$1"
+
+    # Save as current wallpaper
+    echo "$wallpaper" > "$LAST_WALLPAPER"
+
+    # Kill existing swaybg and set new wallpaper
+    pkill -f swaybg
+    swaybg -i "$wallpaper" -m fill &
+
+    # Update Hyprland config
+    ESCAPED_WALLPAPER=$(echo "$wallpaper" | sed 's/[\/&]/\\&/g')
+    if grep -q "^exec = swaybg " "$HYPR_CONF"; then
+        sed -i "/^exec = swaybg /c\\exec = swaybg -i ${ESCAPED_WALLPAPER} -m fill" "$HYPR_CONF"
+    else
+        echo "exec = swaybg -i $wallpaper -m fill" >> "$HYPR_CONF"
+    fi
+
+    # Reload Hyprland to apply changes
+    hyprctl reload >/dev/null 2>&1
+}
+
 
 # --- Theme selection ---
 case "$CHOICE" in
@@ -1314,6 +1343,7 @@ case "$CHOICE" in
         set_swayosd_color "#702963"
         set_zsh_syntax_color_file "13"
         set_dircolors "01;38;2;180;120;220"
+        set_theme_wallpaper "$DEFAULT_WALLPAPER_TELVA"
         echo "Telva" > "$THEME_FILE"
         pkill -SIGUSR2 waybar
         ;;
@@ -1324,6 +1354,7 @@ case "$CHOICE" in
         set_swayosd_color "darkgreen"
         set_zsh_syntax_color_file "120"
         set_dircolors "01;38;2;100;200;160"
+        set_theme_wallpaper "$DEFAULT_WALLPAPER_MATRIX"
         echo "Matrix" > "$THEME_FILE"
         pkill -SIGUSR2 waybar
         ;;
@@ -1334,6 +1365,7 @@ case "$CHOICE" in
         set_swayosd_color "#4169E1"
         set_zsh_syntax_color_file "12"
         set_dircolors "01;34"
+        set_theme_wallpaper "$DEFAULT_WALLPAPER_DEFAULT"
         echo "Default" > "$THEME_FILE"
         pkill -SIGUSR2 waybar
         ;;
@@ -1536,8 +1568,8 @@ bind = $mod SHIFT CTRL, H, exec, alacritty -e nvim ~/.config/hypr/hyprland.conf
 
 # Terminal (mod + enter)
 bind = $mod, RETURN, exec, alacritty
-# Brave Browser (mod + b)
-bind = $mod, B, exec, brave
+# Librewolf Browser (mod + b)
+bind = $mod, B, exec, librewolf
 # File Manager (mod + e)
 bind = $mod, E, exec, thunar
 # Toggle Cheat Sheet (mod + shift + c)
@@ -1756,7 +1788,7 @@ cat > ~/.config/hypr/cheatsheet.txt <<'EOF'
                         Mod + Return .................. Terminal (Alacritty)
                         Mod + Space ................... App launcher (Wofi)
                         Mod + E ....................... File manager (Thunar)
-                        Mod + B ....................... Web browser (Brave)
+                        Mod + B ....................... Web browser (Librewolf)
                         Mod + V ....................... Clipboard manager (Clipman)
                         Ctrl + Shift + Escape ......... Task manager (Lxtask)
 
