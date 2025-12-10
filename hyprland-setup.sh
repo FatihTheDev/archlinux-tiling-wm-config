@@ -10,12 +10,12 @@ sudo pacman -Syu --noconfirm
 
 echo "[2/15] Installing essential packages..."
 sudo pacman -S --noconfirm hyprland swaybg hyprlock hypridle waybar wofi grim slurp wl-clipboard xorg-xwayland \
-    xorg-xhost alacritty librewolf pamac neovim localsend jami-qt proton-vpn-gtk-app obs-studio v4l2loopback-dkms obs-vaapi \
+    xorg-xhost alacritty librewolf pamac neovim localsend jami-qt obs-studio v4l2loopback-dkms obs-vaapi \
     network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
     nwg-look nwg-clipman qimgv thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar udiskie \
     playerctl swaync swayosd libnotify inotify-tools brightnessctl polkit-gnome power-profiles-daemon \
-    lxtask mate-calc gsimplecal gammastep cliphist gnome-font-viewer mousepad autotiling || true
+    carburetor lxtask mate-calc gsimplecal gammastep cliphist gnome-font-viewer mousepad autotiling || true
 
 yay -S --noconfirm masterpdfeditor-free wayscriber-bin || true
 
@@ -352,6 +352,17 @@ image/gif=org.xfce.qimgv.desktop
 image/bmp=org.xfce.qimgv.desktop
 image/webp=org.xfce.qimgv.desktop
 image/svg+xml=librewolf.desktop
+video/mp4=io.github.celluloid_player.Celluloid.desktop
+video/x-matroska=io.github.celluloid_player.Celluloid.desktop
+video/webm=io.github.celluloid_player.Celluloid.desktop
+video/avi=io.github.celluloid_player.Celluloid.desktop
+video/mpeg=io.github.celluloid_player.Celluloid.desktop
+video/quicktime=io.github.celluloid_player.Celluloid.desktop
+audio/mpeg=io.github.celluloid_player.Celluloid.desktop
+audio/flac=io.github.celluloid_player.Celluloid.desktop
+audio/ogg=io.github.celluloid_player.Celluloid.desktop
+audio/wav=io.github.celluloid_player.Celluloid.desktop
+audio/aac=io.github.celluloid_player.Celluloid.desktop
 x-scheme-handler/terminal=Alacritty.desktop
 application/xhtml+xml=librewolf.desktop
 text/xml=librewolf.desktop
@@ -387,7 +398,22 @@ xdg-mime default librewolf.desktop application/atom+xml || true
 # Pdf editor and viewer
 xdg-mime default masterpdfeditor4.desktop application/pdf || true
 
-# Terminal handler
+# Video → Celluloid
+xdg-mime default io.github.celluloid_player.Celluloid.desktop video/mp4 || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop video/x-matroska || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop video/webm || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop video/avi || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop video/mpeg || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop video/quicktime || true
+
+# Audio → Celluloid
+xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/mpeg || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/flac || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/ogg || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/wav || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/aac || true
+
+# Terminal handler → Alacritty
 xdg-mime default Alacritty.desktop x-scheme-handler/terminal || true
 
 # Code → Neovim
