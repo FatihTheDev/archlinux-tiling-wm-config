@@ -641,19 +641,22 @@ general {
     after_sleep_cmd = hyprctl dispatch dpms on
 }
 
+# in 7 minutes (420 seconds) of idle time, lock screen
 listener {
-    timeout = 300 # in 5 minutes (300 seconds) of idle time, lock screen
+    timeout = 420 
     on-timeout = hyprlock
 }
 
+# in 9 minutes (549 seconds) of idle time, turn screen off
 listener {
-    timeout = 420 # in 7 minutes (420 seconds) of idle time, turn screen off
+    timeout = 540 
     on-timeout = hyprctl dispatch dpms off
     on-resume = hyprctl dispatch dpms on
 }
 
+# in 12 minutes (720 seconds) of idle time, suspend to save power
 listener {
-    timeout = 600 # in 10 minutes (600 seconds) of idle time, suspend to save power
+    timeout = 720 
     on-timeout = systemctl suspend
 }
 EOF
