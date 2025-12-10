@@ -647,7 +647,7 @@ listener {
 }
 
 listener {
-    timeout = 540  # in 9 minutes (549 seconds) of idle time, turn screen off
+    timeout = 540  # in 9 minutes (540 seconds) of idle time, turn screen off
     on-timeout = hyprctl dispatch dpms off
     on-resume = hyprctl dispatch dpms on
 }
