@@ -376,6 +376,7 @@ text/x-shellscript=nvim.desktop
 text/x-javascript=nvim.desktop
 text/css=nvim.desktop
 text/x-typescript=nvim.desktop
+application/json=nvim.desktop
 text/markdown=nvim.desktop
 EOF
 
@@ -425,6 +426,7 @@ xdg-mime default nvim.desktop text/x-shellscript || true
 xdg-mime default nvim.desktop text/x-javascript || true
 xdg-mime default nvim.desktop text/css || true
 xdg-mime default nvim.desktop text/x-typescript || true
+xdg-mime default nvim.desktop application/json || true
 xdg-mime default nvim.desktop text/markdown || true
 
 # Plain text → Mousepad
