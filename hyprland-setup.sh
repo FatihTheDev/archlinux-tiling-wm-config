@@ -253,7 +253,7 @@ IMAGES=(
 
 # Download each image
 for URL in "${IMAGES[@]}"; do
-    curl -L "$URL" -o "$DEST_DIR/$(basename $URL)"
+    curl -L "$URL" -o "$DEST_DIR/$(basename $URL)" || true
 done
 
 # -----------------------
