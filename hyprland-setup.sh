@@ -117,9 +117,9 @@ EOF
 bash /tmp/templates.sh
 rm -f /tmp/templates.sh
 
-# ----------------------------------------
-# Adding accounts for Librewolf browser
-# ----------------------------------------
+# -------------------------------------------
+# Modifying preferences for Librewolf browser
+# -------------------------------------------
 # 1. Define paths
 FP_PATH="/usr/lib/librewolf"
 CFG_PATH="$FP_PATH/librewolf.cfg"
@@ -219,6 +219,29 @@ EOF
 echo "[+] Created $ACFILE"
 
 echo "✅ LibreWolf autoconfig successfully installed"
+
+
+# -------------------------------------------------------------------
+# Customizing Librewolf policies (preinstall CanvasBlocker extension)
+# -------------------------------------------------------------------
+# Get the directory of this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Path to policies.json in the repo
+POLICY_SRC="$SCRIPT_DIR/librewolf/policies.json"
+
+# System-wide copy location
+POLICY_ETC="/etc/librewolf/policies.json"
+POLICY_DST="/usr/lib/librewolf/distribution/policies.json"
+
+# Create /etc/librewolf if it doesn't exist
+sudo mkdir -p /etc/librewolf
+
+# Copy the repo policies.json to /etc/librewolf
+sudo install -m 644 "$POLICY_SRC" "$POLICY_ETC"
+
+# Apply immediately to LibreWolf
+sudo install -m 644 "$POLICY_ETC" "$POLICY_DST"
 
 
 # ---------------------------------------
