@@ -117,22 +117,6 @@ EOF
 bash /tmp/templates.sh
 rm -f /tmp/templates.sh
 
-# -------------------------------------------------------------
-# Adding parallel downloads to Pacman and parallel compilation
-# -------------------------------------------------------------
-# uncommenting parallel downloads in /etc/pacman.conf
-sudo sed -i 's/^#\s*\(ParallelDownloads\s*=\s*[0-9]*\)/\1/' /etc/pacman.conf
-# uncommenting MAKEFLAGS to use number of threads available on device in /etc/makepkg.conf
-threads=$(nproc --all)
-sudo awk -v threads="$threads" '
-/^#\s*MAKEFLAGS=/ { sub(/#.*/, "MAKEFLAGS=\"-j" threads "\""); found=1 }
-/^MAKEFLAGS=/ { sub(/=.*/, "=\"-j" threads "\""); found=1 }
-{ print }
-END {
-    if (!found) print "MAKEFLAGS=\"-j" threads "\""
-}
-' /etc/makepkg.conf > /tmp/makepkg.conf && sudo mv /tmp/makepkg.conf /etc/makepkg.conf   
-
 # ----------------------------------------
 # Adding accounts for Librewolf browser
 # ----------------------------------------
