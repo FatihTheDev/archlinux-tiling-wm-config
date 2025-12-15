@@ -889,7 +889,7 @@ EOF
 # ---------------------
 # Adding pacman hooks
 # ---------------------
-echo "Adding pacman hooks to prevent sleep on updates"
+echo "Adding pacman hooks to prevent sleep on updates and persist custom Librewolf policies.json"
 sudo mkdir -p /etc/pacman.d/hooks
 
 sudo tee /etc/pacman.d/hooks/00-inhibit-sleep.hook > /dev/null <<'EOF'
@@ -906,7 +906,6 @@ When = PreTransaction
 Exec = /bin/bash -c "/usr/bin/systemd-inhibit --what=sleep:idle --who=pacman --why='Pacman is running' --mode=block /usr/bin/sleep infinity >/dev/null 2>&1 &"
 EOF
 
-# Write 99-release-inhibit.hook
 sudo tee /etc/pacman.d/hooks/99-release-inhibit.hook > /dev/null <<'EOF'
 [Trigger]
 Operation = Install
@@ -919,6 +918,19 @@ Target = *
 Description = Releasing sleep inhibit lock...
 When = PostTransaction
 Exec = /bin/bash -c "/usr/bin/pkill -f 'systemd-inhibit.*Pacman' || true"
+EOF
+
+sudo tee /etc/pacman.d/hooks/librewolf-policies.hook > /dev/null <<'EOF'
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = librewolf
+
+[Action]
+Description = Restore custom LibreWolf policies.json
+When = PostTransaction
+Exec = /usr/bin/install -m 644 /etc/librewolf/policies.json /usr/lib/librewolf/distribution/policies.json
 EOF
 
 # -----------------------
