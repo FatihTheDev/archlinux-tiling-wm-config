@@ -1558,8 +1558,6 @@ exec-once = gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 exec-once = gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
 exec-once = gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 exec-once = systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
-# Uncomment line below to run Jami messaging app in background on system start
-# exec-once = jami -m
 # Uncomment line below to run Proton VPN in background on system start
 # exec-once = protonvpn-app --start-minimized
 
