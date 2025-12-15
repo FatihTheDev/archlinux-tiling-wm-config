@@ -25,7 +25,7 @@
     "Extensions": {
       "Install": [
         "https://addons.mozilla.org/firefox/downloads/latest/uBlock0@raymondhill.net/latest.xpi",
-	"https://github.com/kkapsner/CanvasBlocker/releases/latest/download/canvasblocker.xpi"
+	    "https://github.com/kkapsner/CanvasBlocker/releases/latest/download/canvasblocker.xpi"
       ],
       "Uninstall": [
         "google@search.mozilla.org",
