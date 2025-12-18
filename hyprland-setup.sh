@@ -31,7 +31,7 @@ mkdir -p ~/Videos
 mkdir -p ~/.config
 
 # Create custom zsh syntax highlighing theme file
-touch ~/.config/zsh_syntax_theme
+touch ~/.config/zsh_theme_sync
 
 # -----------------------
 # Adding file templates
@@ -1344,7 +1344,7 @@ DEFAULT_WALLPAPER_DEFAULT="$HOME/Pictures/Wallpapers/dragon.jpg"
 LAST_WALLPAPER="$HOME/.cache/lastwallpaper"
 
 
-ZSH_SYNTAX_FILE="$HOME/.config/zsh_syntax_theme"
+ZSH_SYNTAX_FILE="$HOME/.config/zsh_theme_sync"
 
 THEME_FILE="$HOME/.config/current_theme"
 
