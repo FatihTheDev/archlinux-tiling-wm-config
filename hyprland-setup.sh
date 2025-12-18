@@ -1133,6 +1133,12 @@ chmod +x ~/.local/bin/dynamic-workspaces.sh
 cat > ~/.local/bin/set-wallpaper.sh <<'EOF'
 #!/bin/bash
 
+# If wofi is already opened, close it
+if pgrep -x wofi >/dev/null; then
+    pkill -x wofi
+    exit 0
+fi
+
 # --- Configuration Variables ---
 DIR="$HOME/Pictures/Wallpapers"
 LAST="$HOME/.cache/lastwallpaper"
@@ -1248,9 +1254,9 @@ MODE=$(printf "Full Screen\nSelect Area" | wofi --dmenu --prompt "Capture mode:"
 if [ "$MODE" = "Select Area" ]; then
     GEOM=$(slurp)
     [ -z "$GEOM" ] && exit 0
-    GEOM="-g \"$GEOM\""  # quote the geometry
+    GEOM="-g \"$GEOM\""
 else
-    GEOM=""  # Full screen
+    GEOM=""
 fi
 
 # Save screenshot to a temporary file
@@ -1262,7 +1268,10 @@ fi
 
 # Ask user for filename
 FILENAME=$(echo "$DEFAULT_FILE" | wofi --dmenu --prompt "Save screenshot as:")
-[ -z "$FILENAME" ] && exit 0
+if [ -z "$FILENAME" ]; then
+    rm -f /tmp/screenshot.png
+    exit 0
+fi
 
 # Append .png if missing
 case "$FILENAME" in
@@ -1270,11 +1279,22 @@ case "$FILENAME" in
     *) FILENAME="$FILENAME.png" ;;
 esac
 
+TARGET="$DIR/$FILENAME"
+
+# If file exists, ask whether to overwrite
+if [ -e "$TARGET" ]; then
+    CONFIRM=$(printf "Overwrite\nCancel" | wofi --dmenu --prompt "File exists. Overwrite?")
+    if [ "$CONFIRM" != "Overwrite" ]; then
+        rm -f /tmp/screenshot.png
+        exit 0
+    fi
+fi
+
 # Move the screenshot to the final location
-mv /tmp/screenshot.png "$DIR/$FILENAME"
+mv /tmp/screenshot.png "$TARGET"
 
 # Notify user
-notify-send "Screenshot saved" "$DIR/$FILENAME"
+notify-send "Screenshot saved" "$TARGET"
 EOF
 chmod +x ~/.local/bin/screenshot.sh
 
