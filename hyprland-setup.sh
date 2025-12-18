@@ -225,24 +225,27 @@ echo "✅ LibreWolf autoconfig successfully installed"
 # Customizing Librewolf policies (preinstall CanvasBlocker extension)
 # -------------------------------------------------------------------
 # Get the directory of this script
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+POLICY_URL="https://raw.githubusercontent.com/FatihTheDev/archlinux-tiling-wm-config/main/librewolf/policies.json"
 
-# Path to policies.json in the repo
-POLICY_SRC="$SCRIPT_DIR/librewolf/policies.json"
-
-# System-wide copy location
+# System-wide locations
 POLICY_ETC="/etc/librewolf/policies.json"
 POLICY_DST="/usr/lib/librewolf/distribution/policies.json"
 
-# Create /etc/librewolf if it doesn't exist
+# Create directories
 sudo mkdir -p /etc/librewolf
+sudo mkdir -p /usr/lib/librewolf/distribution
 
-# Copy the repo policies.json to /etc/librewolf
-sudo install -m 644 "$POLICY_SRC" "$POLICY_ETC"
+# Download the policy file directly to /etc/librewolf
+sudo curl -fLo "$POLICY_ETC" "$POLICY_URL"
 
-# Apply immediately to LibreWolf
-sudo install -m 644 "$POLICY_ETC" "$POLICY_DST"
-
+# Copy to the distribution folder
+if [ -f "$POLICY_ETC" ]; then
+    sudo cp "$POLICY_ETC" "$POLICY_DST"
+    sudo chmod 644 "$POLICY_DST"
+    echo "LibreWolf policies applied successfully."
+else
+    echo "Error: Could not download policies.json from GitHub."
+fi
 
 # ---------------------------------------
 # Download default wallpapers
