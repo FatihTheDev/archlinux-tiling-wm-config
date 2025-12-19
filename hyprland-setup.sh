@@ -1624,7 +1624,6 @@ exec-once = xhost +SI:localuser:root
 exec-once = wl-paste --type text --watch cliphist store
 exec-once = wl-paste --type image --watch cliphist store
 exec-once = nm-applet --indicator
-exec-once = ~/.local/bin/fix-waybar.sh
 exec-once = sleep 1; waybar
 exec-once = udiskie
 exec-once = swaync
@@ -2046,13 +2045,10 @@ echo "[12/15] Creating power menu script..."
 cat > ~/.local/bin/power-menu.sh <<'EOF'
 #!/bin/bash
 
-# Detect compositor
-if pidof sway >/dev/null; then
-    compositor="sway"
-elif pidof Hyprland >/dev/null; then
-    compositor="hyprland"
-else
-    compositor="unknown"
+# If wofi is already opened, close it
+if pgrep -x wofi >/dev/null; then
+    pkill -x wofi
+    exit 0
 fi
 
 # Show menu
@@ -2066,14 +2062,7 @@ case "$choice" in
         systemctl reboot
         ;;
     "Logout")
-        if [ "$compositor" = "sway" ]; then
-            swaymsg exit
-        elif [ "$compositor" = "hyprland" ]; then
-            hyprctl dispatch exit
-        else
-            notify-send "Unknown compositor" "Cannot logout"
-            exit 1
-        fi
+        hyprctl dispatch exit
         ;;
 esac
 EOF
