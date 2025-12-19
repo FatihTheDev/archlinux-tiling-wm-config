@@ -9,7 +9,7 @@ echo "[1/15] Updating system..."
 sudo pacman -Syu --noconfirm
 
 echo "[2/15] Installing essential packages..."
-sudo pacman -S --noconfirm hyprland swaybg hyprlock hypridle waybar wofi grim slurp wl-clipboard xorg-xwayland \
+sudo pacman -S --noconfirm hyprland swaybg hyprlock hypridle waybar socat wofi grim slurp wl-clipboard xorg-xwayland \
     xorg-xhost alacritty librewolf pamac neovim localsend jami-qt obs-studio v4l2loopback-dkms obs-vaapi \
     network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
@@ -1130,6 +1130,25 @@ fi
 EOF
 chmod +x ~/.local/bin/dynamic-workspaces.sh
 
+cat > ~/.local/bin/fix-waybar.sh <<'EOF'
+#!/bin/bash
+
+timeout=5
+interval=0.1
+elapsed=0
+
+while ! socat -t 1 -U - UNIX-CONNECT:"$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" < /dev/null > /dev/null 2>&1; do
+    sleep "$interval"
+    elapsed=$(echo "$elapsed + $interval" | bc -l 2>/dev/null || echo "$elapsed + $interval" | awk '{printf "%.1f", $1}')
+    if [ $(echo "$elapsed >= $timeout" | bc -l 2>/dev/null || echo "$elapsed >= $timeout" | awk '{print ($1 >= $2) ? 1 : 0}') -eq 1 ]; then
+        break
+    fi
+done
+
+exec waybar
+EOF
+chmod +x ~/.local/bin/fix-waybar.sh
+
 # ------------------
 # Wallpaper Settings
 # ------------------
@@ -1605,6 +1624,7 @@ exec-once = xhost +SI:localuser:root
 exec-once = wl-paste --type text --watch cliphist store
 exec-once = wl-paste --type image --watch cliphist store
 exec-once = nm-applet --indicator
+exec-once = ~/.local/bin/fix-waybar.sh
 exec-once = sleep 2 && waybar
 exec-once = udiskie
 exec-once = swaync
