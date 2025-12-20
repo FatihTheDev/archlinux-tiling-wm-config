@@ -495,6 +495,10 @@ cat > ~/.config/waybar/config <<'EOF'
   "modules-center": ["clock"],
   "modules-right": ["battery", "bluetooth", "backlight", "pulseaudio", "hyprland/language", "tray", "custom/notifications"],
 
+  "hyprland": {
+    "reconnect": true 
+  },
+
   "clock": {
     "format": "{:%a %b %d  %H:%M}",
     "tooltip-format": "Click to toggle calendar",
