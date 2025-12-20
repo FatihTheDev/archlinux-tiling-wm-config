@@ -650,8 +650,10 @@ general {
 # The Background
 background {
     monitor = 
-    path = $(cat $HOME/.cache/lastwallpaper)
-    blur_passes = 3    
+    path = $LOCK_WALLPAPER
+    blur_passes = 1
+    # blur_size = 8
+    brightness = 0.5 # Keeps the background dim for eye comfort
 }
 
 # Centered, Dark Input Field
@@ -700,7 +702,7 @@ EOF
 
 cat > ~/.config/hypr/hypridle.conf <<'EOF'
 general {
-    lock_cmd = pidof hyprlock || hyprlock
+    lock_cmd = pidof hyprlock || LOCK_WALLPAPER=$(cat /home/fatihthedev/.cache/lastwallpaper) hyprlock
     before_sleep_cmd = loginctl lock-session
     after_sleep_cmd = hyprctl dispatch dpms on
 }
@@ -1735,7 +1737,7 @@ bind = $mod, SPACE, exec, ~/.local/bin/toggle-wofi.sh
 # Open power menu (mod + shift + q)
 bind = $mod SHIFT, Q, exec, ~/.local/bin/power-menu.sh
 # Lock he screen (mod + ctrl + shift + l)
-bind = $mod CTRL SHIFT, L, exec, hyprlock
+bind = $mod CTRL SHIFT, L, exec, LOCK_WALLPAPER=$(cat /home/fatihthedev/.cache/lastwallpaper) hyprlock
 # Open task manager (mod + shift + esc)
 bind = CTRL SHIFT, ESCAPE, exec, lxtask
 # Open clipboard manager (mod + v)
