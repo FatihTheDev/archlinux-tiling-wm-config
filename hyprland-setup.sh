@@ -14,7 +14,7 @@ sudo pacman -S --noconfirm firewalld hyprland swaybg hyprlock hypridle waybar so
     network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
     nwg-look nwg-clipman qimgv thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar udiskie \
-    playerctl celluloid swaync swayosd libnotify inotify-tools brightnessctl polkit-gnome power-profiles-daemon fd fzf \
+    playerctl celluloid swaync swayosd libnotify inotify-tools ddcutil i2c-tools brightnessctl polkit-gnome power-profiles-daemon fd fzf \
     carburetor lxtask mate-calc gsimplecal ncdu downgrade gammastep cliphist gnome-font-viewer mousepad autotiling || true
 
 yay -S --noconfirm masterpdfeditor-free wayscriber-bin || true
@@ -2086,6 +2086,9 @@ chmod +x ~/.local/bin/power-menu.sh
 echo "[14/15] Setting default brightness to 15%..."
 brightnessctl set 15%
 sudo usermod -aG video $USER
+sudo usermod -aG i2c $USER
+echo 'KERNEL=="i2c-[0-9]*", GROUP="i2c", MODE="0660"' | sudo tee /etc/udev/rules.d/45-ddcutil-i2c.rules
+sudo udevadm control --reload-rules && sudo udevadm trigger
 
 echo "[15/15] Final touches and reminders..."
 echo "✅ Setup complete!"
