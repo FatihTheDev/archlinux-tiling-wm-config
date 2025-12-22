@@ -533,8 +533,8 @@ cat > ~/.config/waybar/config <<'EOF'
 
   "backlight": {
   "format": "<span font='Font Awesome 6 Free'>\uf185</span> {percent}%",
-  "on-scroll-up": "brightnessctl set +5%",
-  "on-scroll-down": "brightnessctl set 5%-",
+  "on-scroll-up": "brightnessctl set +5% && ~/.local/bin/brightness-control.sh +",
+  "on-scroll-down": "brightnessctl set 5%- && ~/.local/bin/brightness-control.sh -",
   "tooltip-format": "Brightness"
   }, 
 
@@ -1141,6 +1141,18 @@ else
 fi
 EOF
 chmod +x ~/.local/bin/dynamic-workspaces.sh
+
+cat > ~/.local/bin/brightness-control.sh <<'EOF'
+#!/bin/bash
+STEP=5
+ACTION=$1
+
+# Loop through all detected DDC displays
+ddcutil detect --terse | grep -o 'Display [0-9]*' | awk '{print $2}' | while read DISPLAY; do
+  ddcutil --display "$DISPLAY" setvcp 10 "$ACTION$STEP" >/dev/null 2>&1
+done
+EOF
+chmod +x ~/.local/bin/brightness-control.sh
 
 cat > ~/.local/bin/fix-waybar.sh <<'EOF'
 #!/bin/bash
@@ -1872,17 +1884,17 @@ bind = $mod SHIFT, M, exec, swayosd-client --output-volume mute-toggle
 # BRIGHTNESS CONTROL
 # ================================
 # Raise brightness by 5%
-binde = , XF86MonBrightnessUp, exec, swayosd-client --brightness +5
+binde = , XF86MonBrightnessUp, exec, swayosd-client --brightness +5 && ~/.local/bin/brightness-control.sh +
 # Lower brightness by 5%
-binde = , XF86MonBrightnessDown, exec, swayosd-client --brightness -5
+binde = , XF86MonBrightnessDown, exec, swayosd-client --brightness -5 && ~/.local/bin/brightness-control.sh -
 
 # ===================
 # ModKey + Shift + Up/Down - fallback brightness control keys
 # ===================
 # Raise brightness by 5%
-bind = $mod SHIFT, UP, exec, swayosd-client --brightness +5
+bind = $mod SHIFT, UP, exec, swayosd-client --brightness +5 && ~/.local/bin/brightness-control.sh +
 # Lower brightness by 5%
-bind = $mod SHIFT, DOWN, exec, swayosd-client --brightness -5
+bind = $mod SHIFT, DOWN, exec, swayosd-client --brightness -5 && ~/.local/bin/brightness-control.sh -
 
 # ================================
 # Show Caps Lock
@@ -2080,14 +2092,15 @@ esac
 EOF
 chmod +x ~/.local/bin/power-menu.sh
 
-# -----------------------
-# Default brightness
-# -----------------------
+# --------------------------------------------------------------------
+# Default brightness and external monitors brightness control setting
+# --------------------------------------------------------------------
 echo "[14/15] Setting default brightness to 15%..."
 brightnessctl set 15%
 sudo usermod -aG video $USER
 sudo usermod -aG i2c $USER
 echo 'KERNEL=="i2c-[0-9]*", GROUP="i2c", MODE="0660"' | sudo tee /etc/udev/rules.d/45-ddcutil-i2c.rules
+echo 'i2c-dev' | sudo tee /etc/modules-load.d/i2c-dev.conf
 sudo udevadm control --reload-rules && sudo udevadm trigger
 
 echo "[15/15] Final touches and reminders..."
