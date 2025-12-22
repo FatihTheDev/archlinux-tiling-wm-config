@@ -2097,6 +2097,9 @@ chmod +x ~/.local/bin/power-menu.sh
 # --------------------------------------------------------------------
 echo "[14/15] Setting default brightness to 15%..."
 brightnessctl set 15%
+for bus in $(ddcutil detect --brief | grep -o 'I2C bus: .*' | grep -o '[0-9]*'); do
+  ddcutil --bus=$bus setvcp 10 15 || true
+done
 sudo usermod -aG video $USER
 sudo usermod -aG i2c $USER
 echo 'KERNEL=="i2c-[0-9]*", GROUP="i2c", MODE="0660"' | sudo tee /etc/udev/rules.d/45-ddcutil-i2c.rules
