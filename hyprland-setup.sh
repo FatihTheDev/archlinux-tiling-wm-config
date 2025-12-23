@@ -526,7 +526,11 @@ cat > ~/.config/waybar/config <<'EOF'
   },
 
   "pulseaudio": {
-    "format": "<span font='Font Awesome 6 Free 11'>\uf026</span> {volume}%",
+    "format": "{icon} {volume}%",
+    "format-icons": {
+    "default": ["\uf027"],
+    "default-muted": ["\uf00d"]
+    },
     "on-click": "pavucontrol",
     "capped-values": true
   },
