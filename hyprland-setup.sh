@@ -1144,12 +1144,17 @@ chmod +x ~/.local/bin/dynamic-workspaces.sh
 
 cat > ~/.local/bin/brightness-control.sh <<'EOF'
 #!/bin/bash
-STEP=5
+STEP=30
 ACTION=$1
 
-# Loop through all detected DDC displays
-ddcutil detect --terse | grep -o 'Display [0-9]*' | awk '{print $2}' | while read DISPLAY; do
-  ddcutil --display "$DISPLAY" setvcp 10 "$ACTION$STEP" >/dev/null 2>&1
+if [[ "$ACTION" != "+" && "$ACTION" != "-" ]]; then
+  echo "Usage: $0 [+|-]"
+  exit 1
+fi
+
+# Use for loop to avoid subshell
+for display in $(ddcutil detect --terse | grep -o 'Display [0-9]*' | awk '{print $2}'); do
+  ddcutil --display "$display" setvcp 10 "$ACTION" "$STEP" --noverify
 done
 EOF
 chmod +x ~/.local/bin/brightness-control.sh
