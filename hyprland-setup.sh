@@ -29,7 +29,7 @@ mkdir -p ~/Pictures/Wallpapers
 mkdir -p ~/Videos
 
 # Start firewall and enable port necessary for Localsend
-sudo systemctl enable firewalld
+sudo systemctl enable --now firewalld
 sudo firewall-cmd --permanent --add-port=53317/tcp
 sudo firewall-cmd --permanent --add-port=53317/udp
 sudo firewall-cmd --reload
