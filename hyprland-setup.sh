@@ -1148,7 +1148,7 @@ chmod +x ~/.local/bin/dynamic-workspaces.sh
 
 cat > ~/.local/bin/brightness-control.sh <<'EOF'
 #!/bin/bash
-STEP=30
+STEP=25
 ACTION=$1
 
 if [[ "$ACTION" != "+" && "$ACTION" != "-" ]]; then
