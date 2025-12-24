@@ -1375,6 +1375,10 @@ fi
 EOF
 chmod +x ~/.local/bin/power-profiles.sh
 
+cat > ~/.local/bin/theme-env.sh <<'EOF'
+[ -f "$HOME/.dircolors" ] && eval "$(dircolors "$HOME/.dircolors")"
+EOF
+
 # ------------------------
 # Theme Switcher
 # ------------------------
@@ -1460,9 +1464,6 @@ set_dircolors() {
 
     # Replace the DIR line safely
     sed -i "s/^DIR[[:space:]].*/DIR ${color_code}/" "$dircolors_file"
-
-    # Reapply LS_COLORS
-    eval "$(dircolors "$dircolors_file")"
 }
 
 # --- zsh-syntax-highlighting ---
