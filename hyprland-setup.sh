@@ -706,14 +706,14 @@ EOF
 
 cat > ~/.config/hypr/hypridle.conf <<'EOF'
 general {
-    lock_cmd = pidof hyprlock || LOCK_WALLPAPER=$(cat /home/fatihthedev/.cache/lastwallpaper) hyprlock
+    lock_cmd = LOCK_WALLPAPER=$(cat /home/fatihthedev/.cache/lastwallpaper) hyprlock
     before_sleep_cmd = loginctl lock-session
     after_sleep_cmd = hyprctl dispatch dpms on
 }
 
 listener {
     timeout = 420  # in 7 minutes (420 seconds) of idle time, lock screen
-    on-timeout = hyprlock
+    on-timeout = $lock_cmd
 }
 
 listener {
