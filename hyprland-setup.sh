@@ -179,6 +179,9 @@ defaultPref("browser.safebrowsing.downloads.enabled", false);
 // ---------------- Enable BeaconDB for geolocation fetching (FOSS Google Location Services alternative) -----------------
 defaultPref("geo.provider.network.url", "https://api.beacondb.net/v1/geolocate");
 
+// --------------- Disable automatic updates ---------------------------
+defaultPref("app.update.auto", false);
+
 // ----------------- Cookie / Storage ---------------------
 defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
 defaultPref("privacy.sanitize.sanitizeOnShutdown", false);
