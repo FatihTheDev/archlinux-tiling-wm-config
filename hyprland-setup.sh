@@ -10,7 +10,7 @@ sudo pacman -Syu --noconfirm
 
 echo "[2/15] Installing essential packages..."
 sudo pacman -S --noconfirm firewalld hyprland swaybg hyprlock hypridle waybar socat wofi grim slurp wl-clipboard xorg-xwayland \
-    xorg-xhost alacritty librewolf pamac neovim localsend obs-studio v4l2loopback-dkms obs-vaapi \
+    xorg-xhost alacritty librewolf archlinux-appstream-data gnome-software neovim localsend obs-studio v4l2loopback-dkms obs-vaapi \
     networkmanager network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
     nwg-look nwg-clipman qimgv thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar udiskie \
