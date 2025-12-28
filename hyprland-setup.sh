@@ -479,7 +479,7 @@ echo "Default applications set (user mimeapps.list written to $MIMEFILE)."
 # Bluetooth installation
 # -----------------------
 echo "[7/15] Installing Bluetooth stack and GUI..."
-sudo pacman -S --noconfirm bluez bluez-utils blueberry
+sudo pacman -S --noconfirm bluez bluez-utils blueman
 sudo systemctl enable bluetooth
 sudo systemctl start bluetooth
 
@@ -503,7 +503,7 @@ cat > ~/.config/waybar/config <<'EOF'
 
   "modules-left": ["hyprland/workspaces"],
   "modules-center": ["clock"],
-  "modules-right": ["battery", "bluetooth", "backlight", "pulseaudio", "hyprland/language", "tray", "custom/notifications"],
+  "modules-right": ["battery", "backlight", "pulseaudio", "hyprland/language", "tray", "custom/notifications"],
 
   "hyprland": {
     "reconnect": true 
@@ -545,13 +545,6 @@ cat > ~/.config/waybar/config <<'EOF'
   "on-scroll-down": "brightnessctl set 5%- && ~/.local/bin/brightness-control.sh -",
   "tooltip-format": "Brightness"
   }, 
-
-  "bluetooth": {
-    "format-on": " {num_connections}",
-    "format-off": " off",
-    "tooltip-format": "Bluetooth: {status}\n{device_alias} ({device_address})",
-    "on-click": "blueberry"
-  },
 
   "hyprland/language": {
     "format": "{short} {variant}"
@@ -1662,6 +1655,7 @@ exec-once = xhost +SI:localuser:root
 exec-once = wl-paste --type text --watch cliphist store
 exec-once = wl-paste --type image --watch cliphist store
 exec-once = nm-applet --indicator
+exec-once = blueman-applet
 exec-once = sleep 1; waybar
 exec-once = udiskie
 exec-once = swaync
