@@ -19,6 +19,12 @@ sudo pacman -S --noconfirm firewalld hyprland swaybg hyprlock hypridle waybar so
 
 yay -S --noconfirm masterpdfeditor-free wayscriber-bin || true
 
+flatpak install --noninteractive --assumeyes flathub org.gnome.NetworkDisplays || true
+flatpak install --noninteractive --assumeyes flathub org.onlyoffice.desktopeditors || true
+flatpak install --noninteractive --assumeyes flathub dev.vencord.Vesktop || true
+flatpak install --noninteractive --assumeyes flathub org.kde.krita || true
+
+
 mkdir -p ~/Desktop
 mkdir -p ~/Code
 mkdir -p ~/Documents
