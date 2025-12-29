@@ -11,7 +11,7 @@ sudo pacman -Syu --noconfirm
 echo "[2/15] Installing essential packages..."
 sudo pacman -S --noconfirm firewalld hyprland swaybg hyprlock hypridle waybar socat wofi grim slurp wl-clipboard xorg-xwayland \
     xorg-xhost alacritty librewolf archlinux-appstream-data gnome-software neovim localsend obs-studio v4l2loopback-dkms obs-vaapi \
-    networkmanager network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
+    networkmanager network-manager-applet proton-vpn-gtk-app nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
     nwg-look nwg-clipman qimgv thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar udiskie \
     playerctl vlc vlc-plugin-ffmpeg swaync swayosd libnotify inotify-tools ddcutil i2c-tools brightnessctl polkit-gnome power-profiles-daemon fd fzf \
@@ -35,10 +35,32 @@ sudo firewall-cmd --permanent --add-port=53317/tcp
 sudo firewall-cmd --permanent --add-port=53317/udp
 sudo firewall-cmd --reload
 
+# Whenever network interface is reconnected, change its mac address (for more anonimity)
+cat > /etc/NetworkManager/dispatcher.d/01-macchanger <<'EOF'
+#!/bin/sh
+INTERFACE=$1
+ACTION=$2
+
+if [ "$ACTION" = "up" ] && [[ "$INTERFACE" == en* ]]; then
+    macchanger -e "$INTERFACE"
+fi
+EOF
+chmod +x /etc/NetworkManager/dispatcher.d/01-macchanger
+
+
 mkdir -p ~/.config
 
 # Create custom zsh syntax highlighing theme file
 touch ~/.config/zsh_theme_sync
+
+# Make Proton VPN automatically connect to fastest server when started
+cat > ~/.config/Proton/VPN/app-config.json << 'EOF'
+{
+    "tray_pinned_servers": [],
+    "connect_at_app_startup": "FASTEST",
+    "start_app_minimized": false
+}
+EOF
 
 # -----------------------
 # Adding file templates
@@ -1667,8 +1689,8 @@ exec-once = gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 exec-once = gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
 exec-once = gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 exec-once = systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
-# Uncomment line below to run Proton VPN in background on system start
-# exec-once = protonvpn-app --start-minimized
+# Comment out line below to stop Proton VPN from running in background on system start
+exec-once = protonvpn-app --start-minimized
 
 # ================================
 # ENVIRONMENT VARIABLES
