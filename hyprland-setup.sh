@@ -36,6 +36,8 @@ sudo firewall-cmd --permanent --add-port=53317/udp
 sudo firewall-cmd --reload
 
 # Whenever network interface is reconnected, change its mac address (for more anonimity)
+sudo pacman -S macchanger
+
 cat > /etc/NetworkManager/dispatcher.d/01-macchanger <<'EOF'
 #!/bin/sh
 INTERFACE=$1
