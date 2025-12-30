@@ -14,7 +14,7 @@ sudo pacman -S --noconfirm firewalld hyprland swaybg hyprlock hypridle waybar so
     networkmanager network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
     nwg-look nwg-clipman qimgv thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar udiskie \
-    playerctl vlc vlc-plugin-ffmpeg swaync swayosd libnotify inotify-tools ddcutil i2c-tools brightnessctl polkit-gnome power-profiles-daemon fd fzf \
+    playerctl vlc vlc-plugin-ffmpeg ocean-sound-theme swaync swayosd libnotify inotify-tools ddcutil i2c-tools brightnessctl polkit-gnome power-profiles-daemon fd fzf \
     proton-vpn-gtk-app torbrowser-launcher lxtask mate-calc gsimplecal ncdu downgrade gammastep cliphist gnome-font-viewer mousepad autotiling || true
 
 yay -S --noconfirm masterpdfeditor-free wayscriber-bin || true
@@ -802,9 +802,7 @@ cat > ~/.config/swaync/config.json <<'EOF'
     "title",
     "dnd",
     "notifications",
-    "mpris",
-    "volume",
-    "brightness"
+    "mpris"
   ],
   "widget-config": {
     "title": {
@@ -813,26 +811,17 @@ cat > ~/.config/swaync/config.json <<'EOF'
     },
     "dnd": {
       "text": "Do Not Disturb"
-    },
-    "volume": {
-      "label": " Volume",
-      "max-volume": 140, 
-      "min-volume": 0,
-      "volume-command-up": "sh -c 'wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+'",
-      "volume-command-down": "sh -c 'wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-'",
-      "volume-command-mute": "sh -c 'wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle'"
-    },
-    "brightness": {
-      "label": "󰃟 Brightness",
-      "min-brightness": 5,
-      "brightness-command-up": "sh -c 'brightnessctl set +5%'",
-      "brightness-command-down": "sh -c 'brightnessctl set 5%-' "
-    },
+    }, 
     "mpris": {
       "image-size": 96,
       "image-radius": 12
     }
+  },
+  "scripts": {
+  "notification-received": {
+    "exec": "paplay /usr/share/sounds/ocean/stereo/message-sent-instant.oga"
   }
+}
 }
 EOF
 
