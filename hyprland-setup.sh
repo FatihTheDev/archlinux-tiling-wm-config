@@ -15,7 +15,7 @@ sudo pacman -S --noconfirm firewalld hyprland swaybg hyprlock hypridle waybar so
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
     nwg-look nwg-clipman qimgv thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar udiskie \
     playerctl vlc vlc-plugin-ffmpeg swaync swayosd libnotify inotify-tools ddcutil i2c-tools brightnessctl polkit-gnome power-profiles-daemon fd fzf \
-    carburetor lxtask mate-calc gsimplecal ncdu downgrade gammastep cliphist gnome-font-viewer mousepad autotiling || true
+    proton-vpn-gtk-app torbrowser-launcher lxtask mate-calc gsimplecal ncdu downgrade gammastep cliphist gnome-font-viewer mousepad autotiling || true
 
 yay -S --noconfirm masterpdfeditor-free wayscriber-bin || true
 
@@ -51,6 +51,15 @@ chmod +x /etc/NetworkManager/dispatcher.d/01-macchanger
 
 
 mkdir -p ~/.config
+
+# COnfiguring Proton VPN to connect automatically to a server when started up
+cat > ~/.config/Proton/VPN/app-config.json <<'EOF'
+{
+    "tray_pinned_servers": [],
+    "connect_at_app_startup": "FASTEST",
+    "start_app_minimized": false
+}
+EOF
 
 # Create custom zsh syntax highlighing theme file
 touch ~/.config/zsh_theme_sync
@@ -1175,25 +1184,6 @@ for display in $(ddcutil detect --terse | grep -o 'Display [0-9]*' | awk '{print
 done
 EOF
 chmod +x ~/.local/bin/brightness-control.sh
-
-cat > ~/.local/bin/fix-waybar.sh <<'EOF'
-#!/bin/bash
-
-timeout=5
-interval=0.1
-elapsed=0
-
-while ! socat -t 1 -U - UNIX-CONNECT:"$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" < /dev/null > /dev/null 2>&1; do
-    sleep "$interval"
-    elapsed=$(echo "$elapsed + $interval" | bc -l 2>/dev/null || echo "$elapsed + $interval" | awk '{printf "%.1f", $1}')
-    if [ $(echo "$elapsed >= $timeout" | bc -l 2>/dev/null || echo "$elapsed >= $timeout" | awk '{print ($1 >= $2) ? 1 : 0}') -eq 1 ]; then
-        break
-    fi
-done
-
-exec waybar
-EOF
-chmod +x ~/.local/bin/fix-waybar.sh
 
 # ------------------
 # Wallpaper Settings
