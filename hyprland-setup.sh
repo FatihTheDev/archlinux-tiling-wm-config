@@ -1367,9 +1367,171 @@ fi
 EOF
 chmod +x ~/.local/bin/power-profiles.sh
 
+cat > ~/.local/bin/account-management.sh <<'EOF'
+#!/bin/bash
+
+# =============================================================================
+# WOFI ACCOUNT MANAGER (Single Action Mode)
+# =============================================================================
+
+# --- Configuration ---
+WOFI_ARGS="--dmenu --cache-file /dev/null --hide-scroll --no-actions --width 500 --height 300"
+PROMPT_ARGS="--dmenu --cache-file /dev/null --lines 1 --width 400 --height 150"
+
+# --- Helper Functions ---
+notify() {
+    notify-send "Account Manager" "$1" --icon=dialog-information
+}
+
+get_input() {
+    # echo "" forces wofi to open in dmenu mode but empty
+    echo "" | wofi $PROMPT_ARGS --prompt "$1"
+}
+
+confirm() {
+    choice=$(echo -e "No\nYes" | wofi $WOFI_ARGS --prompt "$1")
+    if [[ "$choice" == "Yes" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# --- Action Functions ---
+list_users() {
+    # View only. We don't exit here so you can go back to menu.
+    users=$(awk -F: '$3 >= 1000 && $1 != "nobody" {print $1 " (" $3 ")"}' /etc/passwd)
+    echo -e "Wait... Go Back\n$users" | wofi $WOFI_ARGS --prompt "Existing Accounts" > /dev/null
+}
+
+create_account() {
+    # 1. Get Username (If empty/esc, return to menu)
+    username=$(get_input "Enter New Username:")
+    if [[ -z "$username" ]]; then return; fi
+
+    # Check existence
+    if id "$username" &>/dev/null; then
+        notify "User $username already exists!"
+        return # Go back to menu
+    fi
+
+    # 2. Get Password (Allowed to be empty)
+    password=$(get_input "Enter Password (Leave empty for none):")
+    
+    # 3. Sudo Privileges?
+    sudo_choice=$(echo -e "No (Standard User)\nYes (Admin/Sudo)" | wofi $WOFI_ARGS --prompt "Grant Sudo Access?")
+    if [[ -z "$sudo_choice" ]]; then return; fi # Cancelled
+    
+    groups=""
+    if [[ "$sudo_choice" == "Yes (Admin/Sudo)" ]]; then
+        groups="-G wheel" 
+    fi
+
+    # 4. Execute
+    if pkexec useradd -m $groups "$username"; then
+        if [[ -z "$password" ]]; then
+            # Password is empty -> Delete password (allow passwordless)
+            pkexec passwd -d "$username"
+            notify "User $username created (No Password)."
+        else
+            # Password provided -> Set it
+            echo "$username:$password" | pkexec chpasswd
+            notify "User $username created."
+        fi
+        exit 0 # <--- SUCCESS: CLOSE SCRIPT
+    else
+        notify "Failed to create user."
+        # If failed, we return to menu so user can try again
+    fi
+}
+
+delete_account() {
+    user_line=$(awk -F: '$3 >= 1000 && $1 != "nobody" {print $1 " (UID: " $3 ")"}' /etc/passwd | \
+        wofi $WOFI_ARGS --prompt "Select User to Delete")
+    
+    if [[ -z "$user_line" ]]; then return; fi # Cancelled
+
+    target_user=$(echo "$user_line" | awk '{print $1}')
+
+    if [[ "$target_user" == "$USER" ]]; then
+        notify "Cannot delete the current user."
+        return
+    fi
+
+    if confirm "Are you sure you want to delete $target_user?"; then
+        if pkexec userdel -r "$target_user"; then
+            notify "User $target_user deleted."
+            exit 0 # <--- SUCCESS: CLOSE SCRIPT
+        else
+            notify "Failed to delete user."
+        fi
+    fi
+}
+
+change_password() {
+    user_line=$(awk -F: '$3 >= 1000 && $1 != "nobody" {print $1 " (UID: " $3 ")"}' /etc/passwd | \
+        wofi $WOFI_ARGS --prompt "Select User")
+    
+    if [[ -z "$user_line" ]]; then return; fi # Cancelled
+    target_user=$(echo "$user_line" | awk '{print $1}')
+
+    new_pass=$(get_input "Enter New Password for $target_user (Empty for none):")
+    
+    # If user hits Escape on password prompt, do they want to cancel or set empty?
+    # Wofi returns empty string on both Escape and Enter-on-empty.
+    # To differentiate, we assume empty input IS the intention here because the prompt asks for it.
+    
+    if [[ -z "$new_pass" ]]; then
+        pkexec passwd -d "$target_user"
+        if [ $? -eq 0 ]; then
+            notify "Removed password for $target_user"
+            exit 0 # <--- SUCCESS: CLOSE SCRIPT
+        fi
+    else
+        echo "$target_user:$new_pass" | pkexec chpasswd
+        if [ $? -eq 0 ]; then
+            notify "Password changed for $target_user"
+            exit 0 # <--- SUCCESS: CLOSE SCRIPT
+        else
+            notify "Failed to change password."
+        fi
+    fi
+}
+
+# --- Main Logic Loop ---
+
+while true; do
+    options="1. List Accounts\n2. Create New Account\n3. Delete Account\n4. Change Password\n5. Exit"
+    
+    choice=$(echo -e "$options" | wofi $WOFI_ARGS --prompt "Account Manager")
+
+    case $choice in
+        "1. List Accounts")
+            list_users
+            # Loop continues automatically
+            ;;
+        "2. Create New Account")
+            create_account
+            # Loop continues ONLY if create_account returned (cancelled)
+            ;;
+        "3. Delete Account")
+            delete_account
+            ;;
+        "4. Change Password")
+            change_password
+            ;;
+        "5. Exit"|"")
+            exit 0
+            ;;
+    esac
+done
+EOF
+chmod +x ~/.local/bin/account-management.sh
+
 cat > ~/.local/bin/theme-env.sh <<'EOF'
 [ -f "$HOME/.dircolors" ] && eval "$(dircolors "$HOME/.dircolors")"
 EOF
+chmod +x ~/.local/bin/theme-env.sh
 
 # ------------------------
 # Theme Switcher
@@ -1751,6 +1913,8 @@ bind = $mod, T, exec, ~/.local/bin/theme-switcher.sh
 bind = $mod, SPACE, exec, ~/.local/bin/toggle-wofi.sh
 # Open power menu (mod + shift + q)
 bind = $mod SHIFT, Q, exec, ~/.local/bin/power-menu.sh
+# Open account manager (mod + shift + a)
+bind = $mod SHIFT, A, exec, ~/.local/bin/account-management.sh
 # Lock he screen (mod + ctrl + shift + l)
 bind = $mod CTRL SHIFT, L, exec, LOCK_WALLPAPER=$(cat /home/fatihthedev/.cache/lastwallpaper) hyprlock
 # Open task manager (mod + shift + esc)
@@ -1958,6 +2122,7 @@ cat > ~/.config/hypr/cheatsheet.txt <<'EOF'
                     ================================================================================
                         Mod + Shift + Q ............... Power menu (Shutdown, Reboot, etc.)
                         Mod + Ctrl + Shift + L ........ Lock screen (Hyprlock)
+						Mod + Shift + A ............... Account management
                         Mod + Shift + S ............... Take screenshot
                         Mod + Shift + C ............... Toggle this cheatsheet
                         Mod + N ....................... Toggle notifications/control center
