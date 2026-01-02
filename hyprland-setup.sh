@@ -35,7 +35,7 @@ sudo firewall-cmd --permanent --add-port=53317/tcp
 sudo firewall-cmd --permanent --add-port=53317/udp
 sudo firewall-cmd --reload
 
-# Whenever network interface is reconnected, change its mac address (for more anonimity)
+# Whenever ethernet network interface is reconnected, change its mac address (for more anonimity)
 sudo pacman -S macchanger
 
 cat > /etc/NetworkManager/dispatcher.d/01-macchanger <<'EOF'
@@ -52,7 +52,7 @@ chmod +x /etc/NetworkManager/dispatcher.d/01-macchanger
 
 mkdir -p ~/.config
 
-# COnfiguring Proton VPN to connect automatically to a server when started up
+# Configuring Proton VPN to connect automatically to a server when started up
 cat > ~/.config/Proton/VPN/app-config.json <<'EOF'
 {
     "tray_pinned_servers": [],
@@ -63,7 +63,6 @@ EOF
 
 # Create custom zsh syntax highlighing theme file
 touch ~/.config/zsh_theme_sync
-
 
 # -----------------------
 # Adding file templates
@@ -2122,7 +2121,7 @@ cat > ~/.config/hypr/cheatsheet.txt <<'EOF'
                     ================================================================================
                         Mod + Shift + Q ............... Power menu (Shutdown, Reboot, etc.)
                         Mod + Ctrl + Shift + L ........ Lock screen (Hyprlock)
-						Mod + Shift + A ............... Account management
+						Mod + Shift + A ............... Account management (ESC to go back)
                         Mod + Shift + S ............... Take screenshot
                         Mod + Shift + C ............... Toggle this cheatsheet
                         Mod + N ....................... Toggle notifications/control center
