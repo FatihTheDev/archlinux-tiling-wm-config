@@ -2137,6 +2137,7 @@ bind = $mod SHIFT, X, exec, ~/.local/bin/toggle-animations.sh
 # ==================================
 # Wallpaper and Display settings
 # ==================================
+exec = swaybg -i $HOME/Pictures/Wallpapers/dragon.jpg -m fill
 EOF
 
 cat > ~/.config/hypr/cheatsheet.txt <<'EOF'
