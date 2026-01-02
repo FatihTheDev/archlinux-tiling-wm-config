@@ -1804,27 +1804,57 @@ decoration:shadow:enabled = false
 
 
 # ================================
-# STARTUP
+# STARTUP PROGRAMS
 # ================================
+# Authentication Agent
 exec-once = /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+
+# XWayland Permissions
 exec-once = xhost +SI:localuser:root
+
+# Clipboard Manager
 exec-once = wl-paste --type text --watch cliphist store
 exec-once = wl-paste --type image --watch cliphist store
+
+# Applets for WiFi and Bluetooth
 exec-once = nm-applet --indicator
 exec-once = blueman-applet
+
+# Waybar (top bar)
 exec-once = sleep 1; waybar
+
+# Automatic mounting
 exec-once = udiskie
+
+# Notification Center
 exec-once = swaync
+
+# Volume and Brightness indicator (SwayOSD)
 exec-once = swayosd-server -s ~/.config/swayosd/style.css
+
+# Night Light
 exec-once = gammastep -O 1510
+
+# Screen Locking
 exec-once = ~/.local/bin/lock.sh
+
+# GNOME Keyring
 exec-once = /usr/bin/gnome-keyring-daemon --start --components=secrets
+
+# GTK Theme Settings
 exec-once = gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 exec-once = gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
 exec-once = gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+
+# GNOME Software Settings
+exec-once = gsettings set org.gnome.software download-updates false
+exec-once = gsettings set org.gnome.software check-interval 7   
+
+# Sync Session Variables
 exec-once = systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
-# Uncomment line below to run Proton VPN in background on system start
-# exec-once = protonvpn-app --start-minimized
+
+# Uncomment line below to run Proton VPN in background on system start (make sure proton vpn is installed)
+exec-once = protonvpn-app --start-minimized
 
 # ================================
 # ENVIRONMENT VARIABLES
@@ -1832,7 +1862,7 @@ exec-once = systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURR
 env = QT_STYLE_OVERRIDE, Adwaita-dark
 
 # ================================
-# APPEARANCE
+# HYPRLAND APPEARANCE
 # ================================
 general {
     gaps_in = 4
@@ -1862,7 +1892,7 @@ ecosystem {
 input {
     # ba - bosnian layout, en - english layout
     kb_layout = ba,us
-    # Alt + Shift - alt_shift_toggle, Superkey + Space - win_space_toggle
+    # Superkey + Space = win_space_toggle, Alt + Shift = alt_shift_toggle
     kb_options = grp:win_space_toggle
     # Mouse Acceleration
 	accel_profile = adaptive
@@ -1879,71 +1909,92 @@ input {
 }
 
 # ================================
-# APP LAUNCHERS
+# KEYBINDS
 # ================================
-
 # Draw on-screen (press ESC to close drawing mode)
-bind = $mod, D, exec, wayscriber --active
+bind = $mod, D, exec, pidof wayscriber || wayscriber --active
 
-# Edit this hyprland config (~/.config/hypr/hyprland.conf)
+# Edit this hyprland config file (Mod + Shift + Ctrl + h)
 bind = $mod SHIFT CTRL, H, exec, alacritty -e nvim ~/.config/hypr/hyprland.conf
 
-# Terminal (mod + enter)
+# Open Terminal (Mod + Enter)
 bind = $mod, RETURN, exec, alacritty
-# Librewolf Browser (mod + b)
+
+# Open Browser (Mod + B)
 bind = $mod, B, exec, librewolf
-# File Manager (mod + e)
+
+# Open File Manager (Mod + E)
 bind = $mod, E, exec, thunar
-# Toggle Cheat Sheet (mod + shift + c)
+
+# Toggle Cheat Sheet (Mod + Shift + C)
 bind = $mod SHIFT, C, exec, ~/.local/bin/toggle-cheatsheet.sh
-# Take a screenshot (mod + shift + s)
+
+# Take a screenshot (Mod + Shift + S)
 bind = $mod SHIFT, S, exec, ~/.local/bin/screenshot.sh
-# Settings for input devices like mouse and touchpad (mod + shift + i)
+
+# Settings for input devices like mouse and touchpad (Mod + Shift + I)
 bind = $mod SHIFT, I, exec, ~/.local/bin/input-config.sh
-# Settings for displays (mod + shift + d)
+
+# Settings for displays (Mod + Shift + D)
 bind = $mod SHIFT, D, exec, ~/.local/bin/display-settings.sh
-# Wallpaper picker (mod + shift + w) (Must have some images in /home/username/Pictures/Wallpapers to select them)
+
+# Wallpaper picker (Mod + Shift + W) (Must have some images in /home/username/Pictures/Wallpapers to select them)
 bind = $mod SHIFT, W, exec, ~/.local/bin/set-wallpaper.sh
-# GTK GUI settings (mod + shift + t)
+
+# GTK GUI settings (Mod + Shift + T)
 bind = $mod SHIFT, T, exec, nwg-look
-# Theme switcher (mod + t)
+
+# Theme switcher (Mod + T)
 bind = $mod, T, exec, ~/.local/bin/theme-switcher.sh
-# Toggle application Launcher (mod + space)
+
+# Toggle application Launcher (Mod + Space)
 bind = $mod, SPACE, exec, ~/.local/bin/toggle-wofi.sh
-# Open power menu (mod + shift + q)
+
+# Open power menu (Mod + Shift + Q)
 bind = $mod SHIFT, Q, exec, ~/.local/bin/power-menu.sh
-# Open account manager (mod + shift + a)
+
+# Open account manager (Mod + Shift + A)
 bind = $mod SHIFT, A, exec, ~/.local/bin/account-management.sh
-# Lock he screen (mod + ctrl + shift + l)
+
+# Lock the screen (Mod + Ctrl + Shift + L)
 bind = $mod CTRL SHIFT, L, exec, LOCK_WALLPAPER=$(cat /home/fatihthedev/.cache/lastwallpaper) hyprlock
-# Open task manager (mod + shift + esc)
+
+# Open task manager (Mod + Shift + Esc)
 bind = CTRL SHIFT, ESCAPE, exec, lxtask
-# Open clipboard manager (mod + v)
+
+# Reload wofi (top bar) in case of bugs (Mod + Ctrl + Shift + W)
+bind = $mod SHIFT CTRL, W, exec, killall waybar && waybar &
+
+# Open clipboard manager (Mod + V)
 bind = $mod, V, exec, nwg-clipman
+
+
 
 # ================================
 # WINDOW MANAGEMENT
 # ================================
-# Close Window
+# Close Window (Mod + Q)
 bind = $mod, Q, killactive
-# Make window full-screen
+
+# Make window full-screen (Mod + F)
 bind = $mod, F, fullscreen
-# Toggle window between floating and tiling mode
+
+# Toggle window between floating and tiling mode (Mod + Shift + Space)
 bind = $mod SHIFT, SPACE, togglefloating
 
-# Move tiling windows around (with ModKey + Shift + H,J,K,L)
+# Move tiling windows around (with Mod + Shift + H,J,K,L) [Vim Keybinds]
 bind = $mod SHIFT, H, movewindow, l
 bind = $mod SHIFT, J, movewindow, d
 bind = $mod SHIFT, K, movewindow, u
 bind = $mod SHIFT, L, movewindow, r   
 
-# Move floating windows around (with ModKey + Shift + H,J,K,L)
+# Move floating windows around (with Mod + Shift + H,J,K,L)
 bind = $mod SHIFT, H, moveactive, -100 0
 bind = $mod SHIFT, L, moveactive, 100 0
 bind = $mod SHIFT, K, moveactive, 0 -100
 bind = $mod SHIFT, J, moveactive, 0 100
 
-# Move focus between windows (with ModKey + H,J,K,L or ModKey + Arrow Keys)
+# Move focus between windows (with Mod + H,J,K,L or Mod + Arrow Keys)
 bind = $mod, H, movefocus, l
 bind = $mod, L, movefocus, r
 bind = $mod, K, movefocus, u
@@ -1954,9 +2005,9 @@ bind = $mod, RIGHT, movefocus, r
 bind = $mod, UP, movefocus, u
 bind = $mod, DOWN, movefocus, d
 
-# mod + left mouse button drag to move windows around
+# Mod + Left Mouse Button Drag to move windows around
 bindm = $mod, mouse:272, movewindow
-# mod + right mouse button drag to resize windows
+# Mod + Right Mouse Button Drag to resize windows
 bindm = $mod, mouse:273, resizewindow
 
 # ====================================================================
@@ -1964,8 +2015,7 @@ bindm = $mod, mouse:273, resizewindow
 # ====================================================================
 gesture = 4, horizontal, workspace
 
-
-# Zoom in and out with ModKey + Plus / ModKey + Minus
+# Zoom in and out with Mod + Plus / Mod + Minus
 binde = $mod, minus, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 - 0.1}')
 binde = $mod, plus, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 + 0.1}')   
 
@@ -1975,22 +2025,27 @@ binde = $mod, KP_Add, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getopti
 # ================================
 # RESIZE MODE
 # ================================
-# Enter resize mode (close by pressing ESC or ENTER)
+# Enter resize mode (Mod + R) [close by pressing ESC or ENTER]
 bind = $mod, R, submap, resize
 
+# Use H,J,K,L or Arrow Keys when in resize mode to resize currently focused window
 submap = resize
 binde = , L, resizeactive, 10 0
 binde = , H, resizeactive, -10 0
 binde = , K, resizeactive, 0 -10
 binde = , J, resizeactive, 0 10
+binde = , RIGHT, resizeactive, 10 0
+binde = , LEFT, resizeactive, -10 0
+binde = , UP, resizeactive, 0 -10
+binde = , DOWN, resizeactive, 0 10
 bind = , RETURN, submap, reset
 bind = , ESCAPE, submap, reset
 submap = reset
 
 # ================================
-# WORKSPACES
+# WORKSPACE MANAGEMENT
 # ================================
-# Switch Workspaces
+# Switch Workspaces (Mod + Workspace Number)
 bind = $mod, 1, workspace, 1
 bind = $mod, 2, workspace, 2
 bind = $mod, 3, workspace, 3
@@ -2002,7 +2057,7 @@ bind = $mod, 8, workspace, 8
 bind = $mod, 9, workspace, 9
 bind = $mod, 0, workspace, 10
 
-# Move window to workspace
+# Move window from current workspace to specified workspace (Mod + Shift + Workspace Number)
 bind = $mod SHIFT, 1, movetoworkspace, 1
 bind = $mod SHIFT, 2, movetoworkspace, 2
 bind = $mod SHIFT, 3, movetoworkspace, 3
@@ -2014,15 +2069,20 @@ bind = $mod SHIFT, 8, movetoworkspace, 8
 bind = $mod SHIFT, 9, movetoworkspace, 9
 bind = $mod SHIFT, 0, movetoworkspace, 10
 
-# Super + Mouse scroll to switch workspaces dynamically
+# Mod + Mouse scroll to switch workspaces dynamically
 bind = $mod, mouse_up, exec, ~/.local/bin/dynamic-workspaces.sh next
 bind = $mod, mouse_down, exec, ~/.local/bin/dynamic-workspaces.sh prev
+
+# Switch focus between monitors (Mod + Tab -> go to left monitor, Mod + Shift + Tab -> go to right monitor)
+bind = $mod, Tab, focusmonitor, +1
+bind = $mod SHIFT, Tab, focusmonitor, -1
 
 # ================================
 # SWAYNC (Notification Center)
 # ================================
 # Mod + N to toggle the notification/control center
 bind = $mod, N, exec, swaync-client -t
+
 # Mod + Shift + N to close all notifications
 bind = $mod SHIFT, N, exec, swaync-client -C
 
@@ -2031,18 +2091,22 @@ bind = $mod SHIFT, N, exec, swaync-client -C
 # ================================
 # Raise volume by 5%, maximum volume is 155% (set to any value you want)
 binde = , XF86AudioRaiseVolume, exec, swayosd-client --output-volume 5 --max-volume 155
+
 # Lower volume by 5%, maximum volume is 155% (set to any value you want)
 binde = , XF86AudioLowerVolume, exec, swayosd-client --output-volume -5 --max-volume 155
+
 # Mute volume
 bind = , XF86AudioMute, exec, swayosd-client --output-volume mute-toggle
 
 # ===================
-# ModKey + Shift + Right/Left - fallback volume control keys
+# Mod + Shift + Right/Left Arrow Keys - fallback volume control keys
 # ===================
 # Raise volume by 5%, maximum volume is 155% (set to any value you want)
 binde = $mod SHIFT, RIGHT, exec, swayosd-client --output-volume 5 --max-volume 155
+
 # Lower volume by 5%, maximum volume is 155% (set to any value you want)
 binde = $mod SHIFT, LEFT, exec, swayosd-client --output-volume -5 --max-volume 155
+
 # Mute volume
 bind = $mod SHIFT, M, exec, swayosd-client --output-volume mute-toggle
 
@@ -2051,25 +2115,21 @@ bind = $mod SHIFT, M, exec, swayosd-client --output-volume mute-toggle
 # ================================
 # Raise brightness by 5%
 binde = , XF86MonBrightnessUp, exec, swayosd-client --brightness +5 && ~/.local/bin/brightness-control.sh +
+
 # Lower brightness by 5%
 binde = , XF86MonBrightnessDown, exec, swayosd-client --brightness -5 && ~/.local/bin/brightness-control.sh -
 
 # ===================
-# ModKey + Shift + Up/Down - fallback brightness control keys
+# Mod + Shift + Up/Down Arrow Keys - fallback brightness control keys
 # ===================
 # Raise brightness by 5%
-bind = $mod SHIFT, UP, exec, swayosd-client --brightness +5 && ~/.local/bin/brightness-control.sh +
-# Lower brightness by 5%
-bind = $mod SHIFT, DOWN, exec, swayosd-client --brightness -5 && ~/.local/bin/brightness-control.sh -
+binde = $mod SHIFT, UP, exec, swayosd-client --brightness +5 && ~/.local/bin/brightness-control.sh +
 
-# ================================
-# Show Caps Lock
-# ================================
-# Capslock Indicator
-bind = , Caps_Lock, exec, swayosd-client --caps-lock
+# Lower brightness by 5%
+binde = $mod SHIFT, DOWN, exec, swayosd-client --brightness -5 && ~/.local/bin/brightness-control.sh -
 
 # ==================================
-# Check if animations are on or off
+# Toggle Animations On/Off (Mod + Shift + X)
 # ==================================
 exec = bash -c '[ -f ~/.cache/hypr_animations_state ] || echo 1 > ~/.cache/hypr_animations_state; hyprctl keyword animations:enabled $(cat ~/.cache/hypr_animations_state)'
 bind = $mod SHIFT, X, exec, ~/.local/bin/toggle-animations.sh
