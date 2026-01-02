@@ -805,7 +805,7 @@ cat > ~/.config/swaync/config.json <<'EOF'
   ],
   "widget-config": {
     "title": {
-      "text": "Control Center",
+      "text": "Telva Notifications Center",
       "clear-all-button": true
     },
     "dnd": {
@@ -826,8 +826,8 @@ EOF
 
 cat > ~/.config/swaync/style.css <<'EOF'
 /* Note: Removed Gtk theme import. If you want it, use a valid path on your system,
-   like: @import '/usr/share/themes/Adwaita-dark/gtk-3.0/gtk.css'; 
-   But the error suggests this path is invalid, so let's use the defaults. */
+like: @import '/usr/share/themes/Adwaita-dark/gtk-3.0/gtk.css'; 
+But the error suggests this path is invalid, so let's use the defaults. */
 
 /* ======================================= */
 /* OSD Window (Volume/Brightness Indicator) */
@@ -838,34 +838,6 @@ cat > ~/.config/swaync/style.css <<'EOF'
     border: 1px solid rgba(100, 100, 120, 0.5);
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-}
-
-/* The OSD label (e.g., "🔊 Volume") */
-.osd-window .label {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #cdd6f4;
-    margin-bottom: 10px;
-}
-
-/* The OSD progress bar */
-.osd-window progress {
-    background-color: #444;
-    border: none;
-    border-radius: 8px;
-}
-
-.osd-window progress trough {
-    background-color: #333;
-    border-radius: 8px;
-    /* Use min-height to set the size of the bar */
-    min-height: 20px;
-}
-
-.osd-window progress progress {
-    background-color: #89b4fa;
-    /* Accent Color (Blue) */
-    border-radius: 8px;
 }
 
 
@@ -895,6 +867,33 @@ cat > ~/.config/swaync/style.css <<'EOF'
 .body {
     font-size: 1rem;
     color: #cdd6f4;
+}
+
+.widget-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #80b8f0;
+}
+
+.widget-title button {
+    color: #80b8f0;
+    border: 1px solid #80b8f0;
+    background-color: rgba(80b8f0, 0.1);
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-left: auto;
+}
+
+.widget-title button:hover {
+    background-color: rgba(80b8f0, 0.3);
+    color: #80b8f0;
+    border-color: #80b8f0;
+    box-shadow: 0 0 4px #80b8f0;
+    transition: all 0.2s ease;
+}
+
+.widget-title button:active {
+    background-color: rgba(243, 139, 168, 0.2);
 }
 EOF
 
@@ -1607,6 +1606,44 @@ set_swayosd_color() {
     swayosd-server -s "$SWAYOSD_CSS" >/dev/null 2>&1 &
 }
 
+set_swaync_colors() {
+    local title_color="$1"
+    local button_color="$2"
+    local dnd_color="$3"
+
+    sed -i '/\.widget-title {/,/}/c\
+.widget-title {\
+    font-size: 1rem;\
+    font-weight: 600;\
+    color: '"$title_color"';\
+}' "$HOME/.config/swaync/style.css"
+
+    sed -i '/\.widget-title button {/,/}/c\
+.widget-title button {\
+    color: '"$button_color"';\
+    border: 1px solid '"$button_color"';\
+    background-color: rgba('"${button_color:1}"', 0.1);\
+    padding: 4px 8px;\
+    border-radius: 6px;\
+    margin-left: auto;\
+}' "$HOME/.config/swaync/style.css"
+
+sed -i '/\.widget-title button:hover {/,/}/c\
+.widget-title button:hover {\
+    background-color: rgba('"${button_color:1}"', 0.3);\
+    color: '"$button_color"';\
+    border-color: '"$button_color"';\
+    box-shadow: 0 0 5px '"$button_color"';\
+    transition: all 0.2s ease;\
+}' "$HOME/.config/swaync/style.css"
+
+    sed -i '/\.widget-dnd .label {/,/}/c\
+.widget-dnd .label {\
+    color: '"$dnd_color"';\
+    font-weight: 500;\
+}'
+}
+
 # --- Dircolors (for ls and similar commands output color) --
 set_dircolors() {
     local color_code="$1"
@@ -1663,33 +1700,39 @@ case "$CHOICE" in
         set_wofi_highlight "#702963"
         set_hypr_border "a080ccee"
         set_swayosd_color "#702963"
+        set_swaync_colors "#c78cff" "#c78cff" "#c78cff"
         set_zsh_syntax_color_file "13"
         set_dircolors "01;38;2;180;120;220"
         set_theme_wallpaper "$DEFAULT_WALLPAPER_TELVA"
         echo "Telva" > "$THEME_FILE"
         pkill -SIGUSR2 waybar
+        swaync-client -rs
         ;;
     "Matrix")
         set_waybar_color "#7FFFD4"
         set_wofi_highlight "darkgreen"
         set_hypr_border "5fd8b3ee"
         set_swayosd_color "darkgreen"
+        set_swaync_colors "#7FFFD4" "#00CED1" "#7FFFD4"
         set_zsh_syntax_color_file "120"
         set_dircolors "01;38;2;100;200;160"
         set_theme_wallpaper "$DEFAULT_WALLPAPER_MATRIX"
         echo "Matrix" > "$THEME_FILE"
         pkill -SIGUSR2 waybar
+        swaync-client -rs
         ;;
     "Default")
         set_waybar_color "#ffffff"
         set_wofi_highlight "#3a5f9e"
         set_hypr_border "80b8f0ee"
         set_swayosd_color "#4169E1"
+        set_swaync_colors "#80b8f0" "#80b8f0" "#80b8f0"
         set_zsh_syntax_color_file "12"
         set_dircolors "01;34"
         set_theme_wallpaper "$DEFAULT_WALLPAPER_DEFAULT"
         echo "Default" > "$THEME_FILE"
         pkill -SIGUSR2 waybar
+        swaync-client -rs
         ;;
 esac
 EOF
