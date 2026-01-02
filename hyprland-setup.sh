@@ -1637,6 +1637,13 @@ sed -i '/\.widget-title button:hover {/,/}/c\
     transition: all 0.2s ease;\
 }' "$HOME/.config/swaync/style.css"
 
+sed -i '/\.widget-title button:active {/,/}/c\
+.widget-title button.toggle:checked {\
+    background-color: rgba('"${button_color:1}"', 0.2);\
+    color: '"$button_color"';\
+    border-color: '"$button_color"';\
+}' "$HOME/.config/swaync/style.css"
+
     sed -i '/\.widget-dnd .label {/,/}/c\
 .widget-dnd .label {\
     color: '"$dnd_color"';\
