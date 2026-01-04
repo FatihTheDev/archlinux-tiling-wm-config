@@ -217,7 +217,7 @@ defaultPref("privacy.clearOnShutdown.cache", false);
 // ----------------- DNS ----------------------------
 pref("network.trr.uri", "https://dns11.quad9.net/dns-query");
 pref("network.trr.mode", 2);
-defaultPref("network.trr.bootstrapAddress", "1.1.1.1");
+defaultPref("network.trr.bootstrapAddress", "9.9.9.9");
 
 // ----------------- WebRTC Leak Protection ---------------
 defaultPref("media.peerconnection.enabled", true);
