@@ -1903,7 +1903,7 @@ exec-once = gsettings set org.gnome.software check-interval 7
 exec-once = systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
 
 # Uncomment line below to run Proton VPN in background on system start (make sure proton vpn is installed)
-exec-once = protonvpn-app --start-minimized
+# exec-once = protonvpn-app --start-minimized
 
 # ================================
 # ENVIRONMENT VARIABLES
