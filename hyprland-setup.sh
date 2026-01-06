@@ -1591,7 +1591,6 @@ set_hypr_border() {
     local c1="$1"
 
     sed -i 's/^\([[:space:]]*\)col.active_border.*/\1col.active_border = rgba('"$c1"')/' "$HYPR_CONF"
-    hyprctl reload >/dev/null 2>&1
 }
 
 # --- SwayOSD ---
@@ -1694,9 +1693,6 @@ set_theme_wallpaper() {
     else
         echo "exec = swaybg -i $wallpaper -m fill" >> "$HYPR_CONF"
     fi
-
-    # Reload Hyprland to apply changes
-    hyprctl reload >/dev/null 2>&1
 }
 
 
@@ -1714,6 +1710,7 @@ case "$CHOICE" in
         echo "Telva" > "$THEME_FILE"
         pkill -SIGUSR2 waybar
         swaync-client -rs
+        hyprctl reload >/dev/null 2>&1
         ;;
     "Matrix")
         set_waybar_color "#7FFFD4"
@@ -1727,6 +1724,7 @@ case "$CHOICE" in
         echo "Matrix" > "$THEME_FILE"
         pkill -SIGUSR2 waybar
         swaync-client -rs
+        hyprctl reload >/dev/null 2>&1
         ;;
     "Default")
         set_waybar_color "#ffffff"
@@ -1740,6 +1738,7 @@ case "$CHOICE" in
         echo "Default" > "$THEME_FILE"
         pkill -SIGUSR2 waybar
         swaync-client -rs
+        hyprctl reload
         ;;
 esac
 EOF
