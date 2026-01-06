@@ -14,7 +14,7 @@ sudo pacman -S --noconfirm firewalld hyprland swaybg hyprlock hypridle waybar so
     networkmanager network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
     nwg-look nwg-clipman qimgv thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar udiskie \
-    playerctl vlc vlc-plugin-ffmpeg ocean-sound-theme swaync swayosd libnotify inotify-tools ddcutil i2c-tools brightnessctl polkit-gnome power-profiles-daemon fd fzf \
+    playerctl celluloid ocean-sound-theme swaync swayosd libnotify inotify-tools ddcutil i2c-tools brightnessctl polkit-gnome power-profiles-daemon fd fzf \
     proton-vpn-gtk-app torbrowser-launcher lxtask mate-calc gsimplecal ncdu downgrade gammastep cliphist gnome-font-viewer mousepad autotiling || true
 
 yay -S --noconfirm masterpdfeditor-free wayscriber-bin || true
@@ -412,17 +412,17 @@ image/gif=org.xfce.qimgv.desktop
 image/bmp=org.xfce.qimgv.desktop
 image/webp=org.xfce.qimgv.desktop
 image/svg+xml=librewolf.desktop
-video/mp4=vlc.desktop
-video/x-matroska=vlc.desktop
-video/webm=vlc.desktop
-video/avi=vlc.desktop
-video/mpeg=vlc.desktop
-video/quicktime=vlc.desktop
-audio/mpeg=vlc.desktop
-audio/flac=vlc.desktop
-audio/ogg=vlc.desktop
-audio/wav=vlc.desktop
-audio/aac=vlc.desktop
+video/mp4=io.github.celluloid_player.Celluloid.desktop
+video/x-matroska=io.github.celluloid_player.Celluloid.desktop
+video/webm=io.github.celluloid_player.Celluloid.desktop
+video/avi=io.github.celluloid_player.Celluloid.desktop
+video/mpeg=io.github.celluloid_player.Celluloid.desktop
+video/quicktime=io.github.celluloid_player.Celluloid.desktop
+audio/mpeg=io.github.celluloid_player.Celluloid.desktop
+audio/flac=io.github.celluloid_player.Celluloid.desktop
+audio/ogg=io.github.celluloid_player.Celluloid.desktop
+audio/wav=io.github.celluloid_player.Celluloid.desktop
+audio/aac=io.github.celluloid_player.Celluloid.desktop
 x-scheme-handler/terminal=Alacritty.desktop
 application/xhtml+xml=librewolf.desktop
 text/xml=librewolf.desktop
@@ -459,20 +459,20 @@ xdg-mime default librewolf.desktop application/atom+xml || true
 # Pdf editor and viewer
 xdg-mime default masterpdfeditor4.desktop application/pdf || true
 
-# Video → Vlc
-xdg-mime default vlc.desktop video/mp4 || true
-xdg-mime default vlc.desktop video/x-matroska || true
-xdg-mime default vlc.desktop video/webm || true
-xdg-mime default vlc.desktop video/avi || true
-xdg-mime default vlc.desktop video/mpeg || true
-xdg-mime default vlc.desktop video/quicktime || true
+# Video → Celluloid
+xdg-mime default io.github.celluloid_player.Celluloid.desktop video/mp4 || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop video/x-matroska || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop video/webm || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop video/avi || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop video/mpeg || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop video/quicktime || true
 
-# Audio → Vlc
-xdg-mime default vlc.desktop audio/mpeg || true
-xdg-mime default vlc.desktop audio/flac || true
-xdg-mime default vlc.desktop audio/ogg || true
-xdg-mime default vlc.desktop audio/wav || true
-xdg-mime default vlc.desktop audio/aac || true
+# Audio → Celluloid
+xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/mpeg || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/flac || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/ogg || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/wav || true
+xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/aac || true
 
 # Terminal handler → Alacritty
 xdg-mime default Alacritty.desktop x-scheme-handler/terminal || true
