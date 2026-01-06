@@ -523,77 +523,86 @@ mkdir -p ~/.config/waybar
 cat > ~/.config/waybar/config <<'EOF'
 {
   "layer": "top",
-  "position": "top",
+    "position": "top", 
 
-  "modules-left": ["hyprland/workspaces"],
-  "modules-center": ["clock"],
-  "modules-right": ["battery", "backlight", "pulseaudio", "hyprland/language", "tray", "custom/notifications"],
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": ["clock"],
+    "modules-right": ["battery", "backlight", "pulseaudio", "hyprland/language", "custom/locktoggle", "tray", "custom/notifications"],
 
-  "hyprland": {
-    "reconnect": true 
-  },
+    "hyprland": {
+      "reconnect": true 
+    }, 
 
-  "clock": {
-    "format": "{:%a %b %d  %H:%M}",
-    "tooltip-format": "Click to toggle calendar",
-    "on-click": "gsimplecal --toggle"
-  },
-
-  "battery": {
-    "format": "<span font='Font Awesome 6 Free'>{icon}</span> {capacity}% - {time}",
-    "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
-    "format-charging": "<span font='Font Awesome 6 Free'>\uf0e7</span> <span font='Font Awesome 6 Free 11'>{icon}</span> {capacity}% - {time}",
-    "format-full": "<span font='Font Awesome 6 Free'>\uf0e7</span> <span font='Font Awesome 6 Free 11'>{icon}</span> Charged",
-    "format-unknown": "<span font='Font Awesome 6 Free'>\uf390</span>",
-    "interval": 12,
-    "states": {
-      "warning": 20,
-      "critical": 10
+    "clock": {
+      "format": "{:%a %b %d  %H:%M}",
+      "tooltip-format": "Click to toggle calendar",
+      "on-click": "gsimplecal --toggle"
     },
-    "on-click": "~/.local/bin/power-profiles.sh"
-  },
 
-  "pulseaudio": {
-    "format": "{icon} {volume}%",
-    "format-icons": {
-    "default": ["\uf027"],
-    "default-muted": ["\uf00d"]
+    "battery": {
+      "format": "<span font='Font Awesome 6 Free'>{icon}</span> {capacity}% - {time}",
+      "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
+      "format-charging": "<span font='Font Awesome 6 Free'>\uf0e7</span> <span font='Font Awesome 6 Free 11'>{icon}</span> {capacity}% - {time}",
+      "format-full": "<span font='Font Awesome 6 Free'>\uf0e7</span> <span font='Font Awesome 6 Free 11'>{icon}</span> Charged",
+      "format-unknown": "<span font='Font Awesome 6 Free'>\uf390</span>",
+      "interval": 12,
+      "states": {
+        "warning": 20,
+        "critical": 10
+      },
+      "on-click": "~/.local/bin/power-profiles.sh"
     },
-    "on-click": "pavucontrol",
-    "capped-values": true
-  },
 
-  "backlight": {
-  "format": "<span font='Font Awesome 6 Free'>\uf185</span> {percent}%",
-  "on-scroll-up": "brightnessctl set +5% && ~/.local/bin/brightness-control.sh +",
-  "on-scroll-down": "brightnessctl set 5%- && ~/.local/bin/brightness-control.sh -",
-  "tooltip-format": "Brightness"
-  }, 
+    "pulseaudio": {
+      "format": "{icon} {volume}%",
+      "format-icons": {
+        "default": ["\uf027"],
+        "default-muted": ["\uf00d"]
+      },
+      "on-click": "pavucontrol",
+      "capped-values": true
+    },
 
-  "hyprland/language": {
-    "format": "{short} {variant}"
-  },
+    "backlight": {
+      "format": "<span font='Font Awesome 6 Free'>\uf185</span> {percent}%",
+      "on-scroll-up": "brightnessctl set +5% && ~/.local/bin/brightness-control.sh +",
+      "on-scroll-down": "brightnessctl set 5%- && ~/.local/bin/brightness-control.sh -",
+      "tooltip-format": "Brightness"
+    }, 
 
-  "custom/notifications": {
-    "format": "<span font='Font Awesome 6 Free'>\uf0f3</span>",
-    "on-click": "swaync-client -t",
-    "tooltip-format": "Notifications"
-  },
+    "hyprland/language": {
+      "format": "{short} {variant}"
+    },
 
-  "tray": {
-    "icon-size": 15,
-    "spacing": 10
-  },
+    "custom/locktoggle": {
+      "exec": "~/.local/bin/lock_toggle.sh status",
+      "interval": 2,
+      "return-type": "json",
+      "escape": false,
+      "format": "auto lock: {text}",           // uses TEXT from script
+      "on-click": "~/.local/bin/lock_toggle.sh toggle"
+    },
 
-  "hyprland/workspaces": {
-  "format": "{name} {icon}",
-  "on-scroll-up": "hyprctl dispatch workspace e-1",
-  "on-scroll-down": "hyprctl dispatch workspace e+1",
-  "format-icons": {
-    "active": "\u25cf",
-    "default": "\u25CB"
-  }
-  }
+    "custom/notifications": {
+      "format": "<span font='Font Awesome 6 Free'>\uf0f3</span>",
+      "on-click": "swaync-client -t",
+      "tooltip-format": "Notifications"
+    },
+
+    "tray": {
+      "icon-size": 15,
+      "spacing": 10
+    },
+
+    "hyprland/workspaces": {
+      "format": "{name} {icon}",
+      "on-scroll-up": "hyprctl dispatch workspace e-1",
+      "on-scroll-down": "hyprctl dispatch workspace e+1",
+      "format-icons": {
+        "active": "\u25cf",
+        "default": "\u25CB"
+      }
+    }
 }
 EOF
 
@@ -635,6 +644,26 @@ window#waybar {
   margin: 0 5px;
 }
 
+#tray {
+  min-height: 24px;
+  padding: 0 5px;
+}
+
+#custom-locktoggle {
+  color: #8be9fd;
+  /* Cyan by default */
+}
+
+#custom-locktoggle.enabled {
+  color: #96D294;
+  /* Green when auto lock is on */
+}
+
+#custom-locktoggle.disabled {
+  color: #CB4C4E;
+  /* Red when auto lock is off */
+}
+
 /* Padding for modules */
 #battery,
 #pulseaudio,
@@ -642,6 +671,7 @@ window#waybar {
 #bluetooth,
 #backlight,
 #language,
+#custom-locktoggle,
 #tray,
 #custom-notifications,
 #workspaces {
@@ -992,84 +1022,63 @@ opacity = 0.5
 # y = 1
 EOF
 
-# ------------------
-# Screen Locking
-# ------------------
+# --------------------------------
+# Automatic Screen Locking Toggle
+# --------------------------------
 mkdir -p ~/.local/bin
-cat > ~/.local/bin/lock.sh <<'EOF'
+cat > ~/.local/bin/lock-toggle.sh <<'EOF'
 #!/bin/bash
 
-# -----------------------------
-# Configuration
-# -----------------------------
-LOCK_TIMEOUT=300         # 5 minutes (300 seconds) → lock screen
-DPMS_TIMEOUT=600         # 10 minutes (600 seconds) → turn off display
-CONFIG_DIR="$HOME/.config/hypr"
-CONFIG_PATH="$CONFIG_DIR/hypridle.conf"
+STATE_FILE="$HOME/.cache/lock_state"
 
-# --- Compositor Detection & Command Setup ---
-if [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
-    COMPOSITOR="hyprland"
-    IDLE_MANAGER="hypridle"
-    
-    echo "Detected Compositor: Hyprland. Using hypridle and generating config."
-
-elif [ -n "$SWAYSOCK" ]; then
-    COMPOSITOR="sway"
-    IDLE_MANAGER="swayidle"
-    
-    LOCKER_CMD='swaylock -f \
-      -c 000000 \
-      --indicator \
-      --indicator-radius 120 \
-      --indicator-thickness 15 \
-      --inside-color 1e1e2eff \
-      --ring-color 4c7899ff \
-      --key-hl-color 990000ff \
-      --bs-hl-color ff0000ff \
-      --text-color ffffffff \
-      --line-color 00000000 \
-      --separator-color 00000000 \
-      --inside-ver-color 285577ff \
-      --ring-ver-color 4c7899ff \
-      --inside-wrong-color ff0000ff \
-      --ring-wrong-color ff0000ff \
-      --fade-in 0.3'
-      
-    DPMS_OFF_CMD='swaymsg "output * dpms off"'
-    DPMS_ON_CMD='swaymsg "output * dpms on"'
-    
-    # swayidle command line arguments
-    IDLE_ARGS="-w \
-        timeout $LOCK_TIMEOUT \"$LOCKER_CMD\" \
-        timeout $DPMS_TIMEOUT \"$DPMS_OFF_CMD\" \
-        resume \"$DPMS_ON_CMD\" \
-        before-sleep \"$LOCKER_CMD\""
-        
-    echo "Detected Compositor: Sway. Using swayidle."
-    
-else
-    echo "Error: Neither Sway nor Hyprland detected. Exiting."
-    exit 1
-fi
-# -----------------------------
-
-# Kill any existing manager to avoid conflicts
-killall $IDLE_MANAGER 2>/dev/null || true
-
-# --- Execute Idle Manager ---
-if [ "$COMPOSITOR" = "hyprland" ]; then
-    # 3. Execute hypridle, which will automatically find the config file
-    $IDLE_MANAGER &
-
-elif [ "$COMPOSITOR" = "sway" ]; then
-    # swayidle uses command line arguments, using 'eval' for safe execution of the string
-    eval $IDLE_MANAGER $IDLE_ARGS &
+# Default state = enabled
+if [ ! -f "$STATE_FILE" ]; then
+    echo "enabled" > "$STATE_FILE"
 fi
 
-echo "$IDLE_MANAGER started in the background."
+get_state() { cat "$STATE_FILE"; }
+
+# Toggle screen locking (only on click)
+toggle() {
+    if [ "$(get_state)" = "disabled" ]; then
+        echo "enabled" > "$STATE_FILE"
+        hypridle &       # restart auto-lock
+    else
+        echo "disabled" > "$STATE_FILE"
+        pkill hypridle   # stop auto-lock
+    fi
+}
+
+# Output JSON for Waybar
+status_json() {
+    STATE=$(get_state)
+
+    if [ "$STATE" = "disabled" ]; then
+        TEXT="off"
+        TOOLTIP="Screen locking disabled"
+        CLASS="disabled"
+    else
+        TEXT="on"
+        TOOLTIP="Screen locking enabled"
+        CLASS="enabled"
+    fi
+
+    # text MUST contain the icon for Waybar to display it
+    echo "{\"text\": \"$TEXT\", \"tooltip\": \"$TOOLTIP\", \"class\": \"$CLASS\"}"
+}
+
+# --- Main ---
+case "$1" in
+    toggle)
+        toggle
+        status_json
+        ;;
+    status|*)
+        status_json
+        ;;
+esac
 EOF
-chmod +x ~/.local/bin/lock.sh
+chmod +x ~/.local/bin/lock-toggle.sh
 
 # ------------------
 # Cheat sheet for keybindings
@@ -1885,7 +1894,7 @@ exec-once = swayosd-server -s ~/.config/swayosd/style.css
 exec-once = gammastep -O 1510
 
 # Screen Locking
-exec-once = ~/.local/bin/lock.sh
+exec-once = hypridle
 
 # GNOME Keyring
 exec-once = /usr/bin/gnome-keyring-daemon --start --components=secrets
