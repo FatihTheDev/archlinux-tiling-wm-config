@@ -166,88 +166,88 @@ sudo tee "$CFG_PATH" > /dev/null <<'EOF'
 // This file is loaded at Librewolf startup. Do not leave blank lines above this header.
 
 // ----------------- Fingerprinting protection (granular control) ----------------
-defaultPref("privacy.resistFingerprinting", false);
-defaultPref("privacy.fingerprintingProtection", true);
-defaultPref("privacy.fingerprintingProtection.overrides", "+AllTargets,-CSSPrefersColorScheme");   
-lockPref("dom.gamepad.enabled", false);
-lockPref("dom.netinfo.enabled", false);
-// lockPref("dom.enable_performance", false);
-lockPref("dom.telephony.enabled", false);
-lockPref("dom.vibrator.enabled", false);
-lockPref("device.sensors.enabled", false);
-lockPref("dom.battery.enabled", false);
-lockPref("network.http.referer.XOriginPolicy", 2);
+defaultPref(\"privacy.resistFingerprinting\", false);
+defaultPref(\"privacy.fingerprintingProtection\", true);
+defaultPref(\"privacy.fingerprintingProtection.overrides\", \"+AllTargets,-CSSPrefersColorScheme\");   
+lockPref(\"dom.gamepad.enabled\", false);
+lockPref(\"dom.netinfo.enabled\", false);
+// lockPref(\"dom.enable_performance\", false);
+lockPref(\"dom.telephony.enabled\", false);
+lockPref(\"dom.vibrator.enabled\", false);
+lockPref(\"device.sensors.enabled\", false);
+lockPref(\"dom.battery.enabled\", false);
+lockPref(\"network.http.referer.XOriginPolicy\", 2);
 
 // ----------------- Profiles + Accounts -----------------
-defaultPref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
-defaultPref("browser.profiles.enabled", true);
-defaultPref("identity.fxaccounts.enabled", true);  // enables Firefox Sync UI
+defaultPref(\"toolkit.legacyUserProfileCustomizations.stylesheets\", true);
+defaultPref(\"browser.profiles.enabled\", true);
+defaultPref(\"identity.fxaccounts.enabled\", true);  // enables Firefox Sync UI
 
 // ----------------- Set new tab page to blank instead of homepage ----------------
-defaultPref("browser.newtabpage.enabled", false);
-defaultPref("browser.startup.homepage", "about:blank");
+defaultPref(\"browser.newtabpage.enabled\", false);
+defaultPref(\"browser.startup.homepage\", "about:blank");
 
 // ----------------- Set tracker blocking to strict ---------------
-pref("browser.contentblocking.category", "strict");
-pref("privacy.trackingprotection.enabled", true);
-pref("privacy.trackingprotection.pbmode.enabled", true);
-pref("privacy.trackingprotection.socialtracking.enabled", true);
-pref("privacy.trackingprotection.fingerprinting.enabled", true);
-pref("privacy.trackingprotection.cryptomining.enabled", true);
+pref("\browser.contentblocking.category\", "strict");
+pref("\privacy.trackingprotection.enabled\", true);
+pref("\privacy.trackingprotection.pbmode.enabled\", true);
+pref("\privacy.trackingprotection.socialtracking.enabled\", true);
+pref("\privacy.trackingprotection.fingerprinting.enabled\", true);
+pref("\privacy.trackingprotection.cryptomining.enabled\", true);
 
 // ---------------- Disable Google Safe Browsing -----------------
-defaultPref("browser.safebrowsing.malware.enabled", false);
-defaultPref("browser.safebrowsing.phishing.enabled", false);
-defaultPref("browser.safebrowsing.blockedURIs.enabled", false);
-defaultPref("browser.safebrowsing.downloads.enabled", false);
+defaultPref(\"browser.safebrowsing.malware.enabled\", false);
+defaultPref(\"browser.safebrowsing.phishing.enabled\", false);
+defaultPref(\"browser.safebrowsing.blockedURIs.enabled\", false);
+defaultPref(\"browser.safebrowsing.downloads.enabled\", false);
 
 // ---------------- Enable BeaconDB for geolocation fetching (FOSS Google Location Services alternative) -----------------
-defaultPref("geo.provider.network.url", "https://api.beacondb.net/v1/geolocate");
+defaultPref(\"geo.provider.network.url\", \"https://api.beacondb.net/v1/geolocate\");
 
 // --------------- Disable automatic updates ---------------------------
-defaultPref("app.update.auto", false);
+defaultPref(\"app.update.auto\", false);
 
 // ----------------- Cookie / Storage ---------------------
-defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
-defaultPref("privacy.sanitize.sanitizeOnShutdown", false);
-defaultPref("privacy.clearOnShutdown.cookies", false);
-defaultPref("privacy.clearOnShutdown.offlineApps", false);
-defaultPref("privacy.clearOnShutdown.cache", false);
+defaultPref(\"privacy.clearOnShutdown_v2.cookiesAndStorage\", false);
+defaultPref(\"privacy.sanitize.sanitizeOnShutdown\", false);
+defaultPref(\"privacy.clearOnShutdown.cookies\", false);
+defaultPref(\"privacy.clearOnShutdown.offlineApps\", false);
+defaultPref(\"privacy.clearOnShutdown.cache\", false);
 
 // ----------------- DNS ----------------------------
-pref("network.trr.uri", "https://dns11.quad9.net/dns-query");
-pref("network.trr.mode", 2);
-defaultPref("network.trr.bootstrapAddress", "9.9.9.9");
+pref(\"network.trr.uri\", \"https://dns11.quad9.net/dns-query\");
+pref(\"network.trr.mode\", 2);
+defaultPref(\"network.trr.bootstrapAddress\", "9.9.9.9");
 
 // ----------------- WebRTC Leak Protection ---------------
-defaultPref("media.peerconnection.enabled", true);
-pref("media.peerconnection.ice.obfuscate_host_addresses", true);
+defaultPref(\"media.peerconnection.enabled\", true);
+pref(\"media.peerconnection.ice.obfuscate_host_addresses\", true);
 
 // ---------------- Enable WebGL (to not break 3D sites, but still togglable) ------------------
-defaultPref("webgl.disabled", false);
+defaultPref(\"webgl.disabled\", false);
 
 // ----------------- Password Saving ----------------------
-pref("signon.rememberSignons", false);
+pref(\"signon.rememberSignons\", false);
 
 // ----------------- Disable saving search and form history ---------------
-defaultPref("browser.formfill.enable", false);
+defaultPref(\"browser.formfill.enable\", false);
 
 // ----------------- Disable Payments + Autofill ---------------
-pref("dom.payments.enabled", false);
-pref("extensions.formautofill.creditCards.enabled", false);
-pref("extensions.formautofill.addresses.enabled", false);
+pref(\"dom.payments.enabled\", false);
+pref(\"extensions.formautofill.creditCards.enabled\", false);
+pref(\"extensions.formautofill.addresses.enabled\", false);
 
 // ---------------- Enable HTTPS-only mode in private windows only ----------------
-pref("dom.security.https_only_mode", false);
-pref("dom.security.https_only_mode_pbm", true);
+pref(\"dom.security.https_only_mode\", false);
+pref(\"dom.security.https_only_mode_pbm\", true);
 EOF
 
 echo "[+] Created $CFG_PATH"
 
 # 4. Create autoconfig loader
 sudo tee "$ACFILE" > /dev/null <<'EOF'
-pref("general.config.filename", "librewolf.cfg");
-pref("general.config.obscure_value", 0);
+pref(\"general.config.filename\", \"librewolf.cfg\");
+pref(\"general.config.obscure_value\", 0);
 EOF
 
 echo "[+] Created $ACFILE"
