@@ -694,57 +694,37 @@ mkdir -p ~/.config/xdg-desktop-portal
 sudo systemctl enable swayosd-libinput-backend
 
 cat > ~/.config/hypr/hyprlock.conf <<'EOF'
-# Dark Mode / Eye-Friendly hyprlock.conf
-
 general {
-    disable_loading_bar = true
-    grace = 700
     hide_cursor = false
 }
 
-# The Background
 background {
-    monitor = 
     path = $LOCK_WALLPAPER
     blur_passes = 1
-    # blur_size = 8
-    brightness = 0.5 # Keeps the background dim for eye comfort
+    brightness = 0.5
 }
 
-# Centered, Dark Input Field
 input-field {
-    monitor = 
-    size = 300, 50 
-    position = 0, 0 
+    size = 300, 50
+    position = 0, 0
     halign = center
     valign = center
-    
-    outline_thickness = 2 # Thin border
-    
-    # Dark/Muted Colors for minimal intensity
-    inner_color = rgb(151515DD) # Very dark gray, slightly transparent
-    outer_color = rgb(333333FF) # Darker gray border
-    
-    font_color = rgb(AAAAAA) # Muted white text
-    placeholder_text = <span foreground="##555555">Enter Password...</span> # Very dark gray placeholder
-    
-    # Error/Success colors should still be visible but not neon
-    fail_color = rgb(A00000) # Muted red for failure
-    check_color = rgb(006000) # Dark green for success
-    
-    dots_size = 0
+
+    outline_thickness = 2
+    inner_color = 0xDD252525       # Dark background
+    outer_color = 0xFF555555       # Light gray border
+
+    placeholder_text = Enter Password...
+
+    fail_color = 0xFFA00000         # muted red for filed outline on failure
+    check_color = 0xFFCCCC00        # yellow for field outline on pending
 }
 
-# Muted Time Label
 label {
-    monitor = 
     text = cmd[update:1000] echo "<b>$(date +'%H:%M')</b>"
     font_size = 20
-    
-    # Muted white text color
-    color = rgb(999999DD) 
-    
-    position = 0, -150 
+    color = 0xFFFFFFFF
+    position = 0, -180
     halign = center
     valign = center
 }
@@ -757,14 +737,13 @@ EOF
 
 cat > ~/.config/hypr/hypridle.conf <<'EOF'
 general {
-    lock_cmd = LOCK_WALLPAPER=$(cat /home/fatihthedev/.cache/lastwallpaper) hyprlock
     before_sleep_cmd = loginctl lock-session
     after_sleep_cmd = hyprctl dispatch dpms on
 }
 
 listener {
     timeout = 420  # in 7 minutes (420 seconds) of idle time, lock screen
-    on-timeout = $lock_cmd
+    on-timeout = LOCK_WALLPAPER=$(cat /home/fatihthedev/.cache/lastwallpaper) hyprlock
 }
 
 listener {
