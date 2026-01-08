@@ -1013,7 +1013,7 @@ EOF
 # Automatic Screen Locking Toggle
 # --------------------------------
 mkdir -p ~/.local/bin
-cat > ~/.local/bin/lock-toggle.sh <<'EOF'
+cat > ~/.local/bin/lock_toggle.sh <<'EOF'
 #!/bin/bash
 
 STATE_FILE="$HOME/.cache/lock_state"
@@ -1065,7 +1065,7 @@ case "$1" in
         ;;
 esac
 EOF
-chmod +x ~/.local/bin/lock-toggle.sh
+chmod +x ~/.local/bin/lock_toggle.sh
 
 # ------------------
 # Cheat sheet for keybindings
