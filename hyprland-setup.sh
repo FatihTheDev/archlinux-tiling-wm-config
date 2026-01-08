@@ -53,6 +53,9 @@ sudo chmod +x /etc/NetworkManager/dispatcher.d/01-macchanger
 mkdir -p ~/.config
 
 # Configuring Proton VPN to connect automatically to a server when started up
+
+mkdir -p ~/.config/Proton/VPN/
+
 cat > ~/.config/Proton/VPN/app-config.json <<'EOF'
 {
     "tray_pinned_servers": [],
