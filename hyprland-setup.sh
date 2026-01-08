@@ -711,13 +711,15 @@ input-field {
     valign = center
 
     outline_thickness = 2
-    inner_color = 0xDD252525       # Dark background
-    outer_color = 0xFF555555       # Light gray border
+    inner_color = 0xDD737373       # Gray background
+    outer_color = 0xDD434343       # Lighter gray border
 
     placeholder_text = Enter Password...
 
     fail_color = 0xFFA00000         # muted red for filed outline on failure
     check_color = 0xFFCCCC00        # yellow for field outline on pending
+
+    fail_text =
 }
 
 label {
