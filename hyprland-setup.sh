@@ -582,11 +582,12 @@ cat > ~/.config/waybar/config <<'EOF'
 
     "custom/locktoggle": {
       "exec": "~/.local/bin/lock_toggle.sh status",
-      "interval": 2,
+      "exec-on-event": true,
+      "signal": 8,
       "return-type": "json",
       "escape": false,
-      "format": "auto lock: {text}",           // uses TEXT from script
-      "on-click": "~/.local/bin/lock_toggle.sh toggle"
+      "format": "lock: {text}",           // uses TEXT from script
+      "on-click": "~/.local/bin/lock_toggle.sh toggle && pkill -RTMIN+8 waybar"
     },
 
     "custom/notifications": {
