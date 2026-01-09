@@ -1200,8 +1200,7 @@ if [ -n "$CHOICE" ]; then
     echo "$FILE" > "$LAST"
     
     # --- IMMEDIATE WALLPAPER SETTING ---
-    pkill -f swaybg
-    swaybg -i "$FILE" -m fill &
+    swaybg -i -u "$FILE" -m fill &
     
     # --- CONFIGURATION UPDATE ---
 
@@ -1680,8 +1679,7 @@ set_theme_wallpaper() {
     echo "$wallpaper" > "$LAST_WALLPAPER"
 
     # Kill existing swaybg and set new wallpaper
-    pkill -f swaybg
-    swaybg -i "$wallpaper" -m fill &
+    swaybg -i -u "$wallpaper" -m fill &
 
     # Update Hyprland config
     ESCAPED_WALLPAPER=$(echo "$wallpaper" | sed 's/[\/&]/\\&/g')
