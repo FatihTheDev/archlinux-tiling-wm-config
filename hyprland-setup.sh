@@ -582,12 +582,11 @@ cat > ~/.config/waybar/config <<'EOF'
 
     "custom/locktoggle": {
       "exec": "~/.local/bin/lock_toggle.sh status",
-      "exec-on-event": true,
-      "signal": 8,
+      "on-click": "~/.local/bin/lock_toggle.sh toggle",
       "return-type": "json",
-      "escape": false,
-      "format": "locking: {text}",           // uses TEXT from script
-      "on-click": "~/.local/bin/lock_toggle.sh toggle && kill -RTMIN+8 $(pidof waybar)"
+      "interval": "once",
+      "signal": 8,
+      "format": "locking: {text}"
     },
 
     "custom/notifications": {
@@ -1017,52 +1016,55 @@ mkdir -p ~/.local/bin
 cat > ~/.local/bin/lock_toggle.sh <<'EOF'
 #!/bin/bash
 
-STATE_FILE="$HOME/.cache/lock_state"
+STATUS_FILE="$XDG_RUNTIME_DIR/locktoggle-status.json"
 
-# Default state = enabled
-if [ ! -f "$STATE_FILE" ]; then
-    echo "enabled" > "$STATE_FILE"
-fi
-
-get_state() { cat "$STATE_FILE"; }
-
-# Toggle screen locking (only on click)
-toggle() {
-    if [ "$(get_state)" = "disabled" ]; then
-        echo "enabled" > "$STATE_FILE"
-        hypridle &       # restart auto-lock
+get_real_status() {
+    pgrep -x hypridle >/dev/null
+    if [ $? -eq 0 ]; then
+        echo '{"text":"on","tooltip":"Screen locking enabled","class":"enabled"}'
     else
-        echo "disabled" > "$STATE_FILE"
-        pkill hypridle   # stop auto-lock
+        echo '{"text":"off","tooltip":"Screen locking disabled","class":"disabled"}'
     fi
 }
 
-# Output JSON for Waybar
-status_json() {
-    STATE=$(get_state)
-
-    if [ "$STATE" = "disabled" ]; then
-        TEXT="off"
-        TOOLTIP="Screen locking disabled"
-        CLASS="disabled"
-    else
-        TEXT="on"
-        TOOLTIP="Screen locking enabled"
-        CLASS="enabled"
-    fi
-
-    # text MUST contain the icon for Waybar to display it
-    echo "{\"text\": \"$TEXT\", \"tooltip\": \"$TOOLTIP\", \"class\": \"$CLASS\"}"
-}
-
-# --- Main ---
 case "$1" in
-    toggle)
-        toggle
-        status_json
+    "toggle")
+        # Determine current state
+        pgrep -x hypridle >/dev/null
+        RUNNING=$?
+
+        if [ $RUNNING -eq 0 ]; then
+            pkill hypridle
+            echo '{"text":"off","tooltip":"Screen locking disabled","class":"disabled"}' \
+                > "$STATUS_FILE"
+        else
+            hypridle >/dev/null 2>&1 & disown
+            echo '{"text":"on","tooltip":"Screen locking enabled","class":"enabled"}' \
+                > "$STATUS_FILE"
+        fi
+
+        # Update module immediately
+        pkill -RTMIN+8 waybar
         ;;
-    status|*)
-        status_json
+
+    "status")
+        # 1. Return immediately to avoid blocking Waybar
+        if [ -f "$STATUS_FILE" ]; then
+            cat "$STATUS_FILE"
+        else
+            # First run after boot → show placeholder instantly
+            printf '{"text":"…","tooltip":"Checking locking status","class":"loading"}\n'
+        fi
+
+        # 2. Run real check asynchronously AFTER returning
+        (
+            get_real_status > "$STATUS_FILE"
+            pkill -RTMIN+8 waybar
+        ) &
+        ;;
+
+    *)
+        echo '{"text":"…"}'
         ;;
 esac
 EOF
