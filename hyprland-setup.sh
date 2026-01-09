@@ -29,7 +29,7 @@ mkdir -p ~/Pictures/Screenshots
 mkdir -p ~/Pictures/Wallpapers
 mkdir -p ~/Videos
 
-# Start sddm
+# Enable sddm on startup
 sudo systemctl enable sddm
 
 # Start firewall and enable port necessary for Localsend
@@ -1912,7 +1912,7 @@ env = QT_STYLE_OVERRIDE, Adwaita-dark
 # ================================
 general {
     gaps_in = 4
-    gaps_out = 2
+    gaps_out = 4
     border_size = 2
     layout = dwindle
     # Active window border color
