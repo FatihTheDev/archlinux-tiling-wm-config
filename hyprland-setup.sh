@@ -1016,11 +1016,8 @@ mkdir -p ~/.local/bin
 cat > ~/.local/bin/lock_toggle.sh <<'EOF'
 #!/bin/bash
 
-STATUS_FILE="$XDG_RUNTIME_DIR/locktoggle-status.json"
-
 get_real_status() {
-    pgrep -x hypridle >/dev/null
-    if [ $? -eq 0 ]; then
+    if pgrep -x hypridle >/dev/null; then
         echo '{"text":"on","tooltip":"Screen locking enabled","class":"enabled"}'
     else
         echo '{"text":"off","tooltip":"Screen locking disabled","class":"disabled"}'
@@ -1029,42 +1026,23 @@ get_real_status() {
 
 case "$1" in
     "toggle")
-        # Determine current state
-        pgrep -x hypridle >/dev/null
-        RUNNING=$?
-
-        if [ $RUNNING -eq 0 ]; then
+        if pgrep -x hypridle >/dev/null; then
             pkill hypridle
-            echo '{"text":"off","tooltip":"Screen locking disabled","class":"disabled"}' \
-                > "$STATUS_FILE"
         else
             hypridle >/dev/null 2>&1 & disown
-            echo '{"text":"on","tooltip":"Screen locking enabled","class":"enabled"}' \
-                > "$STATUS_FILE"
         fi
 
         # Update module immediately
-        pkill -RTMIN+8 waybar
+        get_real_status
         ;;
 
     "status")
-        # 1. Return immediately to avoid blocking Waybar
-        if [ -f "$STATUS_FILE" ]; then
-            cat "$STATUS_FILE"
-        else
-            # First run after boot → show placeholder instantly
-            printf '{"text":"…","tooltip":"Checking locking status","class":"loading"}\n'
-        fi
-
-        # 2. Run real check asynchronously AFTER returning
-        (
-            get_real_status > "$STATUS_FILE"
-            pkill -RTMIN+8 waybar
-        ) &
+        # Return the real state directly (blocking, but extremely fast)
+        get_real_status
         ;;
 
     *)
-        echo '{"text":"…"}'
+        echo '{"text":"unknown"}'
         ;;
 esac
 EOF
