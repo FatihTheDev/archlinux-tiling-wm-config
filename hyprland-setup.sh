@@ -1364,6 +1364,12 @@ chmod +x ~/.local/bin/power-profiles.sh
 cat > ~/.local/bin/account-management.sh <<'EOF'
 #!/bin/bash
 
+# If wofi is already opened, close it
+if pgrep -x wofi >/dev/null; then
+    pkill -x wofi
+    exit 0
+fi
+
 # =============================================================================
 # WOFI ACCOUNT MANAGER (Single Action Mode)
 # =============================================================================
