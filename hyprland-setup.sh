@@ -586,7 +586,7 @@ cat > ~/.config/waybar/config <<'EOF'
       "signal": 8,
       "return-type": "json",
       "escape": false,
-      "format": "lock: {text}",           // uses TEXT from script
+      "format": "locking: {text}",           // uses TEXT from script
       "on-click": "~/.local/bin/lock_toggle.sh toggle && kill -RTMIN+8 $(pidof waybar)"
     },
 
