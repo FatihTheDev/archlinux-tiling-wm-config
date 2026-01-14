@@ -1896,7 +1896,7 @@ env = QT_STYLE_OVERRIDE, Adwaita-dark
 # ================================
 general {
     gaps_in = 4
-    gaps_out = 4
+    gaps_out = 2
     border_size = 2
     layout = dwindle
     # Active window border color
