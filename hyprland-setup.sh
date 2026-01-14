@@ -511,7 +511,6 @@ echo "Default applications set (user mimeapps.list written to $MIMEFILE)."
 echo "[7/15] Installing Bluetooth stack and GUI..."
 sudo pacman -S --noconfirm bluez bluez-utils blueman
 sudo systemctl enable bluetooth
-sudo systemctl start bluetooth
 
 # ------------------------------------------------
 # Enable NetworkManager and power-profiles-daemon
