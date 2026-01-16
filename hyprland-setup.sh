@@ -52,6 +52,18 @@ fi
 EOF
 sudo chmod +x /etc/NetworkManager/dispatcher.d/01-macchanger
 
+# Enabling automatic hardware video acceleration for mpv and setting it to be by default in Celluloid
+CONFIG_DIR="$HOME/.config/mpv"
+CONFIG_FILE="$CONFIG_DIR/mpv.conf"
+mkdir -p "$CONFIG_DIR"
+cat > "$CONFIG_FILE" <<'EOF'
+hwdec=auto
+vo=gpu
+EOF
+
+gsettings set io.github.celluloid-player.Celluloid mpv-config-enable true
+gsettings set io.github.celluloid-player.Celluloid mpv-config-file "file://$HOME/.config/mpv/mpv.conf"
+
 
 mkdir -p ~/.config
 
@@ -309,30 +321,13 @@ done
 # -----------------------
 # Audio system selection
 # -----------------------
-echo "[3/15] Selecting audio system..."
-echo "Select audio system (default PipeWire):"
-echo "1) PipeWire"
-echo "2) PulseAudio"
-read -p "Enter choice [1-2]: " audio_choice
-audio_choice=${audio_choice:-1}
- 
-if [ "$audio_choice" -eq 2 ]; then
-    echo "[4/15] Installing PulseAudio..."
-    sudo pacman -S --noconfirm pulseaudio pavucontrol
-    echo "PulseAudio selected."
-else
-    echo "[4/15] Installing PipeWire (default)..."
-    sudo pacman -S --noconfirm pipewire pipewire-pulse wireplumber pavucontrol
-    echo "PipeWire selected."
-fi
+echo "[4/15] Installing audio system (PipeWire)..."
+sudo pacman -S --noconfirm pipewire pipewire-pulse wireplumber pavucontrol
 
 echo "[5/15] Enabling audio and desktop portal services..."
-if [ "$audio_choice" -eq 2 ]; then
-    systemctl --user enable pulseaudio xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland
-else
-    systemctl --user enable pipewire pipewire-pulse wireplumber xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland
-fi
+systemctl --user enable pipewire pipewire-pulse wireplumber xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland
 systemctl --user daemon-reload
+
 
 echo "[6/15] Setting default applications..."
 
