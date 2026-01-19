@@ -2221,13 +2221,13 @@ cat > ~/.config/hypr/cheatsheet.txt <<'EOF'
                     ================================================================================
                         Mod + Shift + Q ............... Power menu (Shutdown, Reboot, etc.)
                         Mod + Ctrl + Shift + L ........ Lock screen (Hyprlock)
-						Mod + Shift + A ............... Account management (ESC to go back)
+                        Mod + Shift + A ............... Account management (ESC to go back)
                         Mod + Shift + S ............... Take screenshot
                         Mod + Shift + C ............... Toggle this cheatsheet
                         Mod + N ....................... Toggle notifications/control center
                         Mod + Shift + N ............... Dismiss all notifications
 
-						Mod + Ctrl + Shift + w ........ Reload Waybar
+                        Mod + Ctrl + Shift + W ........ Reload Waybar
 
                     ================================================================================
                                               MEDIA & BRIGHTNESS
@@ -2251,7 +2251,7 @@ cat > ~/.config/hypr/cheatsheet.txt <<'EOF'
                                                   MISCELLANEOUS
                     ================================================================================
                         Mod + D ....................... Draw on screen (wayscriber) — press Esc to exit
-                        Super/Windows key + Space ................... Toggle keyboard layout (ba/us)
+                        Super/Windows key + Space ..... Toggle keyboard layout (ba/us)
 EOF
 
 # -----------------------
