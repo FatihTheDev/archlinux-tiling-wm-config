@@ -2284,6 +2284,7 @@ cat > ~/.config/wofi/config <<'EOF'
 [wofi]
 show=drun
 allow-images=true
+lines=6
 icon-theme=Papirus-Dark
 term=alacritty
 EOF
