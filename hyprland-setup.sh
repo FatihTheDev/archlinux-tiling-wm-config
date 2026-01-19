@@ -1090,7 +1090,7 @@ if pgrep -x "wofi" > /dev/null; then
     pkill wofi
 else
     # If not running, launch it
-    wofi --show drun --height=325 --insensitive --allow-images
+    wofi --show drun --height=325 --width=625 --insensitive --allow-images
 fi
 EOF
 chmod +x ~/.local/bin/toggle-wofi.sh
