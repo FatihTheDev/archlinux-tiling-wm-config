@@ -77,9 +77,9 @@ This setup is designed for **minimal Arch installations** and provides a user-fr
 
 Method 1 - Install using wget (install wget with ```sudo pacman -S wget```):
 - For hyprland:
-  ```sudo wget -qO - https://raw.githubusercontent.com/FatihTheDev/archlinux-sway-config/main/hyprland-setup.sh | bash```
+  ```sudo wget -qO - https://raw.githubusercontent.com/FatihTheDev/archlinux-tiling-wm-config/main/hyprland-setup.sh | bash```
 - For sway:
-  ```sudo wget -qO - https://raw.githubusercontent.com/FatihTheDev/archlinux-sway-config/main/sway-setup.sh | bash```
+  ```sudo wget -qO - https://raw.githubusercontent.com/FatihTheDev/archlinux-tiling-wm-config/main/sway-setup.sh | bash```
 
 Note: This is a capital letter o, not a zero.
 
