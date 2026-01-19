@@ -5,6 +5,21 @@
 
 set -e
 
+# 1. Ask for sudo password immediately
+sudo -v
+
+# 2. Keep-alive: update existing sudo timestamp every 60 seconds
+# This runs in the background and stops automatically when the script ends
+while true; do 
+    sudo -n true
+    sleep 60
+    kill -0 "$$" || exit
+done 2>/dev/null &
+KEEP_ALIVE_PID=$!
+
+# 3. Clean up the background process when the script exits (or is killed)
+trap "kill $KEEP_ALIVE_PID" EXIT
+
 echo "[1/15] Updating system..."
 sudo pacman -Syu --noconfirm
 
