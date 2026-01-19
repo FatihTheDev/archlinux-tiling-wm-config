@@ -53,7 +53,7 @@ This setup is designed for **minimal Arch installations** and provides a user-fr
 | Task Manager GUI (LXTASK)    | Ctrl+Shift+Esc             |
 | Power menu                   | Mod+Shift+Q                |
 | Wallpaper Changer            | Mod+Shift+W                |
-| Tabbed layout toggle         | Mod+T                      |
+| Tabbed layout toggle(for Sway) | Mod+T                      |
 | Floating/Tilind layout toggle| Mod+Shift+Space            |
 | Lock screen                  | Mod+Ctrl+Shift+L           |
 | Screenshot                   | Mod+Shift+S                |
