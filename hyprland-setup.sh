@@ -206,12 +206,12 @@ defaultPref(\"browser.newtabpage.enabled\", false);
 defaultPref(\"browser.startup.homepage\", "about:blank");
 
 // ----------------- Set tracker blocking to strict ---------------
-pref("\browser.contentblocking.category\", "strict");
-pref("\privacy.trackingprotection.enabled\", true);
-pref("\privacy.trackingprotection.pbmode.enabled\", true);
-pref("\privacy.trackingprotection.socialtracking.enabled\", true);
-pref("\privacy.trackingprotection.fingerprinting.enabled\", true);
-pref("\privacy.trackingprotection.cryptomining.enabled\", true);
+pref(\"browser.contentblocking.category\", "strict");
+pref(\"privacy.trackingprotection.enabled\", true);
+pref(\"privacy.trackingprotection.pbmode.enabled\", true);
+pref(\"privacy.trackingprotection.socialtracking.enabled\", true);
+pref(\"privacy.trackingprotection.fingerprinting.enabled\", true);
+pref(\"privacy.trackingprotection.cryptomining.enabled\", true);
 
 // ---------------- Disable Google Safe Browsing -----------------
 defaultPref(\"browser.safebrowsing.malware.enabled\", false);
