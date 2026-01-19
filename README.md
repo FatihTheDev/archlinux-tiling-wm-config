@@ -16,30 +16,30 @@ This setup is designed for **minimal Arch installations** and provides a user-fr
   - Bluetooth status and device management  
   - System tray  
 
-- **Wofi** as an app launcher on `Super + Space` keys
-- **Power menu** with Poweroff, Reboot, Logout via `Super + Shift + Q`  
+- **Wofi** as an app launcher on `Mod + Space` keys
+- **Power menu** with Poweroff, Reboot, Logout via `Mod + Shift + Q`  
 - **Browsers**:
-  - Brave → `Super+B`  
+  - Brave → `Mod+B`  
   - LibreWolf 
-- **Terminal** → `Super+Enter` (Alacritty)  
-- **File manager** → `Super+E` (Thunar)
-- **GTK App Theme Settings** → `Super+Shift+T`
+- **Terminal** → `Mod+Enter` (Alacritty)  
+- **File manager** → `Mod+E` (Thunar)
+- **GTK App Theme Settings** → `Mod+Shift+T`
 - **Task Manager GUI** → `Ctrl+Shift+Esc` (LXTASK)  
 - **Keyboard layouts**: Bosnian (`ba`) and English (`us`), switched with `Alt+Shift`  
-- **Screenshot tool** → `Super+Shift+S`  
+- **Screenshot tool** → `Mod+Shift+S`  
 - **Volume controls**:
   - XF86 hardware keys supported  
-  - Smart fallback keys if hardware keys fail: `Super+Shift+Right` (volume up), `Super+Shift+Left` (volume down), `Super+Shift+M` (mute)  
+  - Smart fallback keys if hardware keys fail: `Mod+Shift+Right` (volume up), `Mod+Shift+Left` (volume down), `Mod+Shift+M` (mute)  
 - **Brightness controls**:
   - XF86 hardware keys supported  
-  - Smart fallback keys if hardware keys fail: `Super+Shift+Up` (increase), `Super+Shift+Down` (decrease)  
+  - Smart fallback keys if hardware keys fail: `Mod+Shift+Up` (increase), `Mod+Shift+Down` (decrease)  
   - Default brightness set to **15%**  
-- **Wallpaper Changer (need to have an image in ~/Pictures/Wallpapers)** → `Super+Shift+W`
-- **Tabbed layout toggle (Hyprland doesn't support tabbed layout)** -> `Super+T`
-- **Floating/Tilind layouts toggle** -> `Super+Shift+Space`
-- **Lock screen** -> `Super+Ctrl+Shift+L`
+- **Wallpaper Changer (need to have an image in ~/Pictures/Wallpapers)** → `Mod+Shift+W`
+- **Tabbed layout toggle (Hyprland doesn't support tabbed layout)** -> `Mod+T`
+- **Floating/Tilind layouts toggle** -> `Mod+Shift+Space`
+- **Lock screen** -> `Mod+Ctrl+Shift+L`
 - **Media keys**: Play/Pause, Next, Previous (via Playerctl)
-- **Display CheatSheet of all keybindings** -> `Super+Shift+C`
+- **Display CheatSheet of all keybindings** -> `Mod+Shift+C`
 
 ---
 
@@ -47,29 +47,29 @@ This setup is designed for **minimal Arch installations** and provides a user-fr
 
 | Action                      | Keybinding                  |
 |------------------------------|-----------------------------|
-| App launcher (Wofi)          | Super + Space                |
-| Brave browser                | Super+B                      |
-| Terminal (Alacritty)         | Super+Enter                  |
-| File manager (Thunar)        | Super+E                      |
+| App launcher (Wofi)          | Mod + Space                |
+| Brave browser                | Mod+B                      |
+| Terminal (Alacritty)         | Mod+Enter                  |
+| File manager (Thunar)        | Mod+E                      |
 | Task Manager GUI (LXTASK)    | Ctrl+Shift+Esc               |
-| Power menu                   | Super+Shift+Q                |
-| Wallpaper Changer            | Super+Shift+W                |
-| Tabbed layout toggle         | Super+T                      |
-| Floating/Tilind layout toggle| Super+Shift+Space            |
-| Lock screen                  | Super+Ctrl+Shift+L           |
-| Screenshot                   | Super+Shift+S                |
-| Volume Up                    | XF86AudioRaiseVolume / Super+Shift+Right |
-| Volume Down                  | XF86AudioLowerVolume / Super+Shift+Left |
-| Mute Toggle                  | XF86AudioMute / Super+Shift+M |
-| Brightness Up                | XF86MonBrightnessUp / Super+Shift+Up |
-| Brightness Down              | XF86MonBrightnessDown / Super+Shift+Down |
-| Fullscreen toggle            | Super+F                      |
-| Close window                 | Super+Q                      |
+| Power menu                   | Mod+Shift+Q                |
+| Wallpaper Changer            | Mod+Shift+W                |
+| Tabbed layout toggle         | Mod+T                      |
+| Floating/Tilind layout toggle| Mod+Shift+Space            |
+| Lock screen                  | Mod+Ctrl+Shift+L           |
+| Screenshot                   | Mod+Shift+S                |
+| Volume Up                    | XF86AudioRaiseVolume / Mod+Shift+Right |
+| Volume Down                  | XF86AudioLowerVolume / Mod+Shift+Left |
+| Mute Toggle                  | XF86AudioMute / Mod+Shift+M |
+| Brightness Up                | XF86MonBrightnessUp / Mod+Shift+Up |
+| Brightness Down              | XF86MonBrightnessDown / Mod+Shift+Down |
+| Fullscreen toggle            | Mod+F                      |
+| Close window                 | Mod+Q                      |
 | Keyboard layout toggle       | Alt+Shift                    |
 | Media Play/Pause             | XF86AudioPlay                |
 | Media Next                   | XF86AudioNext                |
 | Media Previous               | XF86AudioPrev                |
-| Display CheatSheet           | Super+Shift+C                |
+| Display CheatSheet           | Mod+Shift+C                |
 
 ---
 
