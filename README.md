@@ -19,13 +19,12 @@ This setup is designed for **minimal Arch installations** and provides a user-fr
 - **Wofi** as an app launcher on `Mod + Space` keys
 - **Power menu** with Poweroff, Reboot, Logout via `Mod + Shift + Q`  
 - **Browsers**:
-  - Brave → `Mod+B`  
-  - LibreWolf 
+  - LibreWolf → `Mod+B`
 - **Terminal** → `Mod+Enter` (Alacritty)  
 - **File manager** → `Mod+E` (Thunar)
 - **GTK App Theme Settings** → `Mod+Shift+T`
 - **Task Manager GUI** → `Ctrl+Shift+Esc` (LXTASK)  
-- **Keyboard layouts**: Bosnian (`ba`) and English (`us`), switched with `Alt+Shift`  
+- **Keyboard layouts**: Bosnian (`ba`) and English (`us`), switched with `SUperKey+Space`  
 - **Screenshot tool** → `Mod+Shift+S`  
 - **Volume controls**:
   - XF86 hardware keys supported  
@@ -46,12 +45,12 @@ This setup is designed for **minimal Arch installations** and provides a user-fr
 ## Keybindings Overview
 
 | Action                      | Keybinding                  |
-|------------------------------|-----------------------------|
+|------------------------------|----------------------------|
 | App launcher (Wofi)          | Mod + Space                |
-| Brave browser                | Mod+B                      |
+| Librewolf browser            | Mod+B                      |
 | Terminal (Alacritty)         | Mod+Enter                  |
 | File manager (Thunar)        | Mod+E                      |
-| Task Manager GUI (LXTASK)    | Ctrl+Shift+Esc               |
+| Task Manager GUI (LXTASK)    | Ctrl+Shift+Esc             |
 | Power menu                   | Mod+Shift+Q                |
 | Wallpaper Changer            | Mod+Shift+W                |
 | Tabbed layout toggle         | Mod+T                      |
@@ -65,10 +64,10 @@ This setup is designed for **minimal Arch installations** and provides a user-fr
 | Brightness Down              | XF86MonBrightnessDown / Mod+Shift+Down |
 | Fullscreen toggle            | Mod+F                      |
 | Close window                 | Mod+Q                      |
-| Keyboard layout toggle       | Alt+Shift                    |
-| Media Play/Pause             | XF86AudioPlay                |
-| Media Next                   | XF86AudioNext                |
-| Media Previous               | XF86AudioPrev                |
+| Keyboard layout toggle       | Super+Space                |
+| Media Play/Pause             | XF86AudioPlay              |
+| Media Next                   | XF86AudioNext              |
+| Media Previous               | XF86AudioPrev              |
 | Display CheatSheet           | Mod+Shift+C                |
 
 ---
