@@ -2001,7 +2001,7 @@ bind = $mod CTRL SHIFT, L, exec, LOCK_WALLPAPER=$(cat /home/fatihthedev/.cache/l
 # Open task manager (Mod + Shift + Esc)
 bind = CTRL SHIFT, ESCAPE, exec, lxtask
 
-# Reload wofi (top bar) in case of bugs (Mod + Ctrl + Shift + W)
+# Reload waybar (top bar) in case of bugs (Mod + Ctrl + Shift + W)
 bind = $mod SHIFT CTRL, W, exec, killall waybar && waybar &
 
 # Open clipboard manager (Mod + V)
@@ -2226,6 +2226,8 @@ cat > ~/.config/hypr/cheatsheet.txt <<'EOF'
                         Mod + Shift + C ............... Toggle this cheatsheet
                         Mod + N ....................... Toggle notifications/control center
                         Mod + Shift + N ............... Dismiss all notifications
+
+						Mod + Ctrl + Shift + w ........ Reload Waybar
 
                     ================================================================================
                                               MEDIA & BRIGHTNESS
