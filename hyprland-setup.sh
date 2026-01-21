@@ -756,6 +756,7 @@ cat > ~/.config/hypr/hypridle.conf <<'EOF'
 general {
     before_sleep_cmd = loginctl lock-session
     after_sleep_cmd = hyprctl dispatch dpms on
+    on-resume = hyprctl dispatch dpms on
 }
 
 listener {
@@ -770,7 +771,7 @@ listener {
 }
 
 listener {
-    timeout = 720  # in 12 minutes (720 seconds) of idle time, suspend to save power
+    timeout = 900  # in 15 minutes (900 seconds) of idle time, suspend to save power
     on-timeout = systemctl suspend
 }
 EOF
