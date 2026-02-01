@@ -68,6 +68,10 @@ fi
 EOF
 sudo chmod +x /etc/NetworkManager/dispatcher.d/01-macchanger
 
+# Enabling IP forwarding (for Ettercap to work)
+echo "net.ipv4.ip_forward = 1" | sudo tee /etc/sysctl.d/30-ipforward.conf > /dev/null
+sudo sysctl -p /etc/sysctl.d/30-ipforward.conf 
+
 # Enabling automatic hardware video acceleration for mpv and setting it to be by default in Celluloid
 CONFIG_DIR="$HOME/.config/mpv"
 CONFIG_FILE="$CONFIG_DIR/mpv.conf"
