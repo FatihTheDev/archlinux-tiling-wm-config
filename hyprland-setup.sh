@@ -55,18 +55,14 @@ sudo firewall-cmd --permanent --add-port=53317/udp
 sudo firewall-cmd --reload
 
 # Whenever ethernet network interface is reconnected, change its mac address (for more anonimity)
-sudo pacman -S --noconfirm macchanger
+sudo tee /etc/NetworkManager/conf.d/99-random-mac.conf > /dev/null <<'EOF'
+[device]
+wifi.scan-rand-mac-address=yes
 
-sudo tee /etc/NetworkManager/dispatcher.d/01-macchanger > /dev/null <<'EOF'
-#!/bin/sh
-INTERFACE=$1
-ACTION=$2
-
-if [ "$ACTION" = "up" ] && [[ "$INTERFACE" == en* ]]; then
-    macchanger -e "$INTERFACE"
-fi
+[connection]
+wifi.cloned-mac-address=random
+ethernet.cloned-mac-address=random
 EOF
-sudo chmod +x /etc/NetworkManager/dispatcher.d/01-macchanger
 
 
 # Enabling automatic hardware video acceleration for mpv and setting it to be by default in Celluloid
