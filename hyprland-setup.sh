@@ -48,6 +48,9 @@ mkdir -p ~/Videos
 # Enable sddm on startup
 sudo systemctl enable sddm
 
+# Adding user to WIreshark group
+sudo usermod -aG wireshark $USER
+
 # Start firewall and enable port necessary for Localsend
 sudo systemctl enable --now firewalld
 sudo firewall-cmd --permanent --add-port=53317/tcp
