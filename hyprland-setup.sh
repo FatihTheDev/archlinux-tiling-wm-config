@@ -71,14 +71,25 @@ EOF
 # Enabling automatic hardware video acceleration for mpv and setting it to be by default in Celluloid
 CONFIG_DIR="$HOME/.config/mpv"
 CONFIG_FILE="$CONFIG_DIR/mpv.conf"
+INPUT_FILE="$CONFIG_DIR/input.conf"
+
 mkdir -p "$CONFIG_DIR"
+
 cat > "$CONFIG_FILE" <<'EOF'
 hwdec=auto
 vo=gpu
 EOF
 
+# input.conf for volume control via arrow keys
+cat > "$INPUT_FILE" <<'EOF'
+UP add volume 5
+DOWN add volume -5
+EOF
+
 gsettings set io.github.celluloid-player.Celluloid mpv-config-enable true
 gsettings set io.github.celluloid-player.Celluloid mpv-config-file "file://$HOME/.config/mpv/mpv.conf"
+gsettings set io.github.celluloid-player.Celluloid mpv-input-config-enable true
+gsettings set io.github.celluloid-player.Celluloid mpv-input-config-file "file://$HOME/.config/mpv/input.conf"
 
 
 mkdir -p ~/.config
