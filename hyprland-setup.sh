@@ -20,6 +20,16 @@ KEEP_ALIVE_PID=$!
 # 3. Clean up the background process when the script exits (or is killed)
 trap "kill $KEEP_ALIVE_PID" EXIT
 
+# 4. Determine target user (for post-install chroot from installation.sh vs standalone run)
+if [[ -n "${INSTALL_USER:-}" ]]; then
+    TARGET_USER="$INSTALL_USER"
+    TARGET_HOME=$(getent passwd "$TARGET_USER" | cut -d: -f6)
+else
+    TARGET_USER="${USER:-$(whoami)}"
+    TARGET_HOME="${HOME:-$(getent passwd "$TARGET_USER" | cut -d: -f6)}"
+fi
+export TARGET_USER TARGET_HOME
+
 echo "[1/15] Updating system..."
 sudo pacman -Syu --noconfirm
 
@@ -36,20 +46,20 @@ sudo pacman -S --noconfirm sddm firewalld hyprland swaybg hyprlock hypridle wayb
 yay -S --noconfirm masterpdfeditor-free wayscriber-bin || true
 
 
-mkdir -p ~/Desktop
-mkdir -p ~/Code
-mkdir -p ~/Documents
-mkdir -p ~/Downloads
-mkdir -p ~/Pictures
-mkdir -p ~/Pictures/Screenshots
-mkdir -p ~/Pictures/Wallpapers
-mkdir -p ~/Videos
+mkdir -p "$TARGET_HOME/Desktop"
+mkdir -p "$TARGET_HOME/Code"
+mkdir -p "$TARGET_HOME/Documents"
+mkdir -p "$TARGET_HOME/Downloads"
+mkdir -p "$TARGET_HOME/Pictures"
+mkdir -p "$TARGET_HOME/Pictures/Screenshots"
+mkdir -p "$TARGET_HOME/Pictures/Wallpapers"
+mkdir -p "$TARGET_HOME/Videos"
 
 # Enable sddm on startup
 sudo systemctl enable sddm
 
 # Adding user to WIreshark group
-sudo usermod -aG wireshark $USER
+sudo usermod -aG wireshark "$TARGET_USER"
 
 # Start firewall and enable port necessary for Localsend
 sudo systemctl enable --now firewalld
@@ -69,7 +79,7 @@ EOF
 
 
 # Enabling automatic hardware video acceleration for mpv and setting it to be by default in Celluloid
-CONFIG_DIR="$HOME/.config/mpv"
+CONFIG_DIR="$TARGET_HOME/.config/mpv"
 CONFIG_FILE="$CONFIG_DIR/mpv.conf"
 INPUT_FILE="$CONFIG_DIR/input.conf"
 
@@ -95,19 +105,19 @@ Ctrl+RIGHT seek 60
 Ctrl+LEFT seek -60
 EOF
 
-gsettings set io.github.celluloid-player.Celluloid mpv-config-enable true
-gsettings set io.github.celluloid-player.Celluloid mpv-config-file "file://$HOME/.config/mpv/mpv.conf"
-gsettings set io.github.celluloid-player.Celluloid mpv-input-config-enable true
-gsettings set io.github.celluloid-player.Celluloid mpv-input-config-file "file://$HOME/.config/mpv/input.conf"
+runuser -u "$TARGET_USER" -- env "HOME=$TARGET_HOME" gsettings set io.github.celluloid-player.Celluloid mpv-config-enable true 2>/dev/null || true
+runuser -u "$TARGET_USER" -- env "HOME=$TARGET_HOME" gsettings set io.github.celluloid-player.Celluloid mpv-config-file "file://$TARGET_HOME/.config/mpv/mpv.conf" 2>/dev/null || true
+runuser -u "$TARGET_USER" -- env "HOME=$TARGET_HOME" gsettings set io.github.celluloid-player.Celluloid mpv-input-config-enable true 2>/dev/null || true
+runuser -u "$TARGET_USER" -- env "HOME=$TARGET_HOME" gsettings set io.github.celluloid-player.Celluloid mpv-input-config-file "file://$TARGET_HOME/.config/mpv/input.conf" 2>/dev/null || true
 
 
-mkdir -p ~/.config
+mkdir -p "$TARGET_HOME/.config"
 
 # Configuring Proton VPN to connect automatically to a server when started up
 
-mkdir -p ~/.config/Proton/VPN/
+mkdir -p "$TARGET_HOME/.config/Proton/VPN/"
 
-cat > ~/.config/Proton/VPN/app-config.json <<'EOF'
+cat > "$TARGET_HOME/.config/Proton/VPN/app-config.json" <<'EOF'
 {
     "tray_pinned_servers": [],
     "connect_at_app_startup": "FASTEST",
@@ -116,12 +126,13 @@ cat > ~/.config/Proton/VPN/app-config.json <<'EOF'
 EOF
 
 # Create custom zsh syntax highlighing theme file
-touch ~/.config/zsh_theme_sync
+touch "$TARGET_HOME/.config/zsh_theme_sync"
 
 # -----------------------
 # Adding file templates
 # -----------------------
-echo 'XDG_TEMPLATES_DIR="$HOME/.local/share/templates"' >> ~/.config/user-dirs.dirs
+mkdir -p "$TARGET_HOME/.config"
+echo 'XDG_TEMPLATES_DIR="$HOME/.local/share/templates"' >> "$TARGET_HOME/.config/user-dirs.dirs"
 
 cat > /tmp/templates.sh <<'EOF'
 #!/bin/bash
@@ -199,7 +210,7 @@ chmod -w "$TEMPLATES"
 rm -rf "$WORKDIR"
 EOF
 
-bash /tmp/templates.sh
+HOME="$TARGET_HOME" bash /tmp/templates.sh
 rm -f /tmp/templates.sh
 
 # -------------------------------------------
@@ -339,7 +350,7 @@ fi
 # Download default wallpapers
 # ---------------------------------------
 # Destination directory
-DEST_DIR="$HOME/Pictures/Wallpapers"
+DEST_DIR="$TARGET_HOME/Pictures/Wallpapers"
 mkdir -p "$DEST_DIR"
 
 # List of raw image URLs
@@ -361,14 +372,18 @@ echo "[4/15] Installing audio system (PipeWire)..."
 sudo pacman -S --noconfirm pipewire pipewire-pulse wireplumber pavucontrol
 
 echo "[5/15] Enabling audio and desktop portal services..."
-systemctl --user enable pipewire pipewire-pulse wireplumber xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland
-systemctl --user daemon-reload
+runuser -u "$TARGET_USER" -- env "HOME=$TARGET_HOME" systemctl --user enable pipewire pipewire-pulse wireplumber xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland 2>/dev/null || \
+    (mkdir -p "$TARGET_HOME/.config/systemd/user/default.target.wants" && \
+     for svc in pipewire pipewire-pulse wireplumber xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland; do
+         [ -f "/usr/lib/systemd/user/$svc.service" ] && ln -sf "/usr/lib/systemd/user/$svc.service" "$TARGET_HOME/.config/systemd/user/default.target.wants/" 2>/dev/null || true
+     done)
+runuser -u "$TARGET_USER" -- env "HOME=$TARGET_HOME" systemctl --user daemon-reload 2>/dev/null || true
 
 
 echo "[6/15] Setting default applications..."
 
 # ensure dirs exist
-mkdir -p ~/.local/share/applications
+mkdir -p "$TARGET_HOME/.local/share/applications"
 
 # install xdg-utils if missing (non-blocking)
 if ! command -v xdg-mime >/dev/null 2>&1; then
@@ -379,8 +394,8 @@ fi
 # Create fallback .desktop files (only if missing)
 
 # AUR Package Search (through Librewolf)
-if [[ ! -f ~/.local/share/applications/librewolf-AUR_Package_Search.desktop ]]; then
-cat > ~/.local/share/applications/librewolf-AUR_Package_Search.desktop <<'EOF'
+if [[ ! -f "$TARGET_HOME/.local/share/applications/librewolf-AUR_Package_Search.desktop" ]]; then
+cat > "$TARGET_HOME/.local/share/applications/librewolf-AUR_Package_Search.desktop" <<'EOF'
 #!/usr/bin/env xdg-open
 [Desktop Entry]
 Version=1.0
@@ -394,8 +409,8 @@ EOF
 fi
 
 # Chaotic AUR Package Search (through Librewolf)
-if [[ ! -f ~/.local/share/applications/librewolf-Chaotic_AUR_Package_Search.desktop ]]; then
-cat > ~/.local/share/applications/librewolf-Chaotic_AUR_Package_Search.desktop <<'EOF'
+if [[ ! -f "$TARGET_HOME/.local/share/applications/librewolf-Chaotic_AUR_Package_Search.desktop" ]]; then
+cat > "$TARGET_HOME/.local/share/applications/librewolf-Chaotic_AUR_Package_Search.desktop" <<'EOF'
 #!/usr/bin/env xdg-open
 [Desktop Entry]
 Version=1.0
@@ -409,8 +424,8 @@ EOF
 fi
 
 # Neovim
-if [[ ! -f ~/.local/share/applications/nvim.desktop ]]; then
-cat > ~/.local/share/applications/nvim.desktop <<'EOF'
+if [[ ! -f "$TARGET_HOME/.local/share/applications/nvim.desktop" ]]; then
+cat > "$TARGET_HOME/.local/share/applications/nvim.desktop" <<'EOF'
 [Desktop Entry]
 Name=Neovim
 GenericName=Text Editor
@@ -428,11 +443,11 @@ fi
 
 # Update desktop database (user-level) if tool exists; don't fail script on error
 if command -v update-desktop-database >/dev/null 2>&1; then
-    update-desktop-database ~/.local/share/applications || true
+    update-desktop-database "$TARGET_HOME/.local/share/applications" || true
 fi
 
 # Build (or replace) user-level mimeapps list (freedesktop standard)
-MIMEFILE="$HOME/.config/mimeapps.list"
+MIMEFILE="$TARGET_HOME/.config/mimeapps.list"
 cat > "$MIMEFILE" <<'EOF'
 [Default Applications]
 text/plain=org.xfce.mousepad.desktop
@@ -480,59 +495,59 @@ EOF
 # Also set via xdg-mime as a fallback (make browser open files for viewing and neovim for editing)
 
 # Images → qimgv
-xdg-mime default org.xfce.qimgv.desktop image/png image/jpeg image/jpg image/bmp image/gif || true
+HOME="$TARGET_HOME" xdg-mime default org.xfce.qimgv.desktop image/png image/jpeg image/jpg image/bmp image/gif || true
 
 # Default file manager -> Thunar
-xdg-mime default thunar.desktop inode/directory
+HOME="$TARGET_HOME" xdg-mime default thunar.desktop inode/directory || true
 
 # Browser stuff → Librewolf
-xdg-mime default librewolf.desktop text/html || true
-xdg-mime default librewolf.desktop application/xhtml+xml || true
-xdg-mime default librewolf.desktop image/svg+xml || true
-xdg-mime default librewolf.desktop text/xml || true
-xdg-mime default librewolf.desktop application/rss+xml || true
-xdg-mime default librewolf.desktop application/atom+xml || true
+HOME="$TARGET_HOME" xdg-mime default librewolf.desktop text/html || true
+HOME="$TARGET_HOME" xdg-mime default librewolf.desktop application/xhtml+xml || true
+HOME="$TARGET_HOME" xdg-mime default librewolf.desktop image/svg+xml || true
+HOME="$TARGET_HOME" xdg-mime default librewolf.desktop text/xml || true
+HOME="$TARGET_HOME" xdg-mime default librewolf.desktop application/rss+xml || true
+HOME="$TARGET_HOME" xdg-mime default librewolf.desktop application/atom+xml || true
 
 # Pdf editor and viewer
-xdg-mime default masterpdfeditor4.desktop application/pdf || true
+HOME="$TARGET_HOME" xdg-mime default masterpdfeditor4.desktop application/pdf || true
 
 # Video → Celluloid
-xdg-mime default io.github.celluloid_player.Celluloid.desktop video/mp4 || true
-xdg-mime default io.github.celluloid_player.Celluloid.desktop video/x-matroska || true
-xdg-mime default io.github.celluloid_player.Celluloid.desktop video/webm || true
-xdg-mime default io.github.celluloid_player.Celluloid.desktop video/avi || true
-xdg-mime default io.github.celluloid_player.Celluloid.desktop video/mpeg || true
-xdg-mime default io.github.celluloid_player.Celluloid.desktop video/quicktime || true
+HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop video/mp4 || true
+HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop video/x-matroska || true
+HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop video/webm || true
+HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop video/avi || true
+HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop video/mpeg || true
+HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop video/quicktime || true
 
 # Audio → Celluloid
-xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/mpeg || true
-xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/flac || true
-xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/ogg || true
-xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/wav || true
-xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/aac || true
+HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/mpeg || true
+HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/flac || true
+HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/ogg || true
+HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/wav || true
+HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/aac || true
 
 # Terminal handler → Alacritty
-xdg-mime default Alacritty.desktop x-scheme-handler/terminal || true
+HOME="$TARGET_HOME" xdg-mime default Alacritty.desktop x-scheme-handler/terminal || true
 
 # Code → Neovim
-xdg-mime default nvim.desktop text/x-c || true
-xdg-mime default nvim.desktop text/x-c++ || true
-xdg-mime default nvim.desktop text/x-python || true
-xdg-mime default nvim.desktop text/x-java || true
-xdg-mime default nvim.desktop text/x-shellscript || true
-xdg-mime default nvim.desktop text/x-javascript || true
-xdg-mime default nvim.desktop text/css || true
-xdg-mime default nvim.desktop text/x-typescript || true
-xdg-mime default nvim.desktop application/json || true
-xdg-mime default nvim.desktop text/markdown || true
+HOME="$TARGET_HOME" xdg-mime default nvim.desktop text/x-c || true
+HOME="$TARGET_HOME" xdg-mime default nvim.desktop text/x-c++ || true
+HOME="$TARGET_HOME" xdg-mime default nvim.desktop text/x-python || true
+HOME="$TARGET_HOME" xdg-mime default nvim.desktop text/x-java || true
+HOME="$TARGET_HOME" xdg-mime default nvim.desktop text/x-shellscript || true
+HOME="$TARGET_HOME" xdg-mime default nvim.desktop text/x-javascript || true
+HOME="$TARGET_HOME" xdg-mime default nvim.desktop text/css || true
+HOME="$TARGET_HOME" xdg-mime default nvim.desktop text/x-typescript || true
+HOME="$TARGET_HOME" xdg-mime default nvim.desktop application/json || true
+HOME="$TARGET_HOME" xdg-mime default nvim.desktop text/markdown || true
 
 # Plain text → Mousepad
-xdg-mime default org.xfce.mousepad.desktop text/plain || true
+HOME="$TARGET_HOME" xdg-mime default org.xfce.mousepad.desktop text/plain || true
 
 # Export env vars once (avoid duplicates)
-grep -qxF 'export BROWSER=librewolf' ~/.profile 2>/dev/null || echo 'export BROWSER=librewolf' >> ~/.profile
-grep -qxF 'export TERMINAL=alacritty' ~/.profile 2>/dev/null || echo 'export TERMINAL=alacritty' >> ~/.profile
-grep -qxF 'export DOCUMENT_VIEWER=masterpdfeditor4' ~/.profile 2>/dev/null || echo 'export DOCUMENT_VIEWER=masterpdfeditor4' >> ~/.profile
+grep -qxF 'export BROWSER=librewolf' "$TARGET_HOME/.profile" 2>/dev/null || echo 'export BROWSER=librewolf' >> "$TARGET_HOME/.profile"
+grep -qxF 'export TERMINAL=alacritty' "$TARGET_HOME/.profile" 2>/dev/null || echo 'export TERMINAL=alacritty' >> "$TARGET_HOME/.profile"
+grep -qxF 'export DOCUMENT_VIEWER=masterpdfeditor4' "$TARGET_HOME/.profile" 2>/dev/null || echo 'export DOCUMENT_VIEWER=masterpdfeditor4' >> "$TARGET_HOME/.profile"
 
 echo "Default applications set (user mimeapps.list written to $MIMEFILE)."
 
@@ -554,9 +569,9 @@ sudo systemctl enable power-profiles-daemon
 # -----------------------
 echo "[8/15] Configuring Waybar..."
 
-mkdir -p ~/.config/waybar
+mkdir -p "$TARGET_HOME/.config/waybar"
 
-cat > ~/.config/waybar/config <<'EOF'
+cat > "$TARGET_HOME/.config/waybar/config" <<'EOF'
 {
   "layer": "top",
     "position": "top", 
@@ -642,8 +657,8 @@ cat > ~/.config/waybar/config <<'EOF'
 }
 EOF
 
-if [[ ! -f ~/.config/waybar/style.css ]]; then
-cat > ~/.config/waybar/style.css <<'EOF'
+if [[ ! -f "$TARGET_HOME/.config/waybar/style.css" ]]; then
+cat > "$TARGET_HOME/.config/waybar/style.css" <<'EOF'
 /* ---------- THEME VARIABLES ---------- */
 @define-color module_text #ffffff;
 
@@ -720,16 +735,16 @@ fi
 # Configure Hyprland
 # -----------------------
 echo "[9/15] Configuring Hyprland..."
-mkdir -p ~/.config/hypr
-mkdir -p ~/.config/swaync
-mkdir -p ~/.config/swayosd
-mkdir -p ~/.config/xfce4
-mkdir -p ~/.config/xdg-desktop-portal
+mkdir -p "$TARGET_HOME/.config/hypr"
+mkdir -p "$TARGET_HOME/.config/swaync"
+mkdir -p "$TARGET_HOME/.config/swayosd"
+mkdir -p "$TARGET_HOME/.config/xfce4"
+mkdir -p "$TARGET_HOME/.config/xdg-desktop-portal"
 
 # Start swayosd libinput backend
 sudo systemctl enable swayosd-libinput-backend
 
-cat > ~/.config/hypr/hyprlock.conf <<'EOF'
+cat > "$TARGET_HOME/.config/hypr/hyprlock.conf" <<'EOF'
 general {
     hide_cursor = false
 }
@@ -769,11 +784,11 @@ label {
 EOF
 
 # Setting default terminal to Alacritty for Thunar
-cat > ~/.config/xfce4/helpers.rc <<'EOF'
+cat > "$TARGET_HOME/.config/xfce4/helpers.rc" <<'EOF'
 TerminalEmulator=alacritty
 EOF
 
-cat > ~/.config/hypr/hypridle.conf <<'EOF'
+cat > "$TARGET_HOME/.config/hypr/hypridle.conf" <<'EOF'
 general {
     before_sleep_cmd = loginctl lock-session
     after_sleep_cmd = hyprctl dispatch dpms on
@@ -782,7 +797,7 @@ general {
 
 listener {
     timeout = 420  # in 7 minutes (420 seconds) of idle time, lock screen
-    on-timeout = LOCK_WALLPAPER=$(cat /home/fatihthedev/.cache/lastwallpaper) hyprlock
+    on-timeout = LOCK_WALLPAPER=$(cat $HOME/.cache/lastwallpaper) hyprlock
 }
 
 listener {
@@ -800,7 +815,7 @@ EOF
 # --------------------------------------
 # Configure xdg-desktop-portal-hyprland
 # --------------------------------------
-cat > ~/.config/hypr/xdph.conf <<'EOF'
+cat > "$TARGET_HOME/.config/hypr/xdph.conf" <<'EOF'
 screencopy {
 allow_token_by_default = true
 }
@@ -809,7 +824,7 @@ EOF
 # --------------------------------------------------
 # Configuring desktop portals (for proper dark mode)
 # --------------------------------------------------
-cat > ~/.config/xdg-desktop-portal/hyprland-portals.conf <<'EOF'
+cat > "$TARGET_HOME/.config/xdg-desktop-portal/hyprland-portals.conf" <<'EOF'
 [preferred]
 default=hyprland;gtk
 EOF
@@ -817,7 +832,7 @@ EOF
 # -----------------------
 # Configuring SwayNC
 # -----------------------
-cat > ~/.config/swaync/config.json <<'EOF'
+cat > "$TARGET_HOME/.config/swaync/config.json" <<'EOF'
 {
   "positionX": "right",
   "positionY": "top",
@@ -872,7 +887,7 @@ cat > ~/.config/swaync/config.json <<'EOF'
 }
 EOF
 
-cat > ~/.config/swaync/style.css <<'EOF'
+cat > "$TARGET_HOME/.config/swaync/style.css" <<'EOF'
 /* Note: Removed Gtk theme import. If you want it, use a valid path on your system,
 like: @import '/usr/share/themes/Adwaita-dark/gtk-3.0/gtk.css'; 
 But the error suggests this path is invalid, so let's use the defaults. */
@@ -948,7 +963,7 @@ EOF
 # --------------------------
 # COnfiguring SwayOSD for colored volume and brightness indicator
 # --------------------------
-cat > ~/.config/swayosd/style.css <<'EOF'
+cat > "$TARGET_HOME/.config/swayosd/style.css" <<'EOF'
 window#osd {
   background: rgba(0, 0, 0, 0.9);
 }
@@ -1013,8 +1028,8 @@ EOF
 # Configure Alacritty (transparent background)
 # -----------------------
 echo "[10/15] Configuring Alacritty"
-mkdir -p ~/.config/alacritty
-cat > ~/.config/alacritty/alacritty.toml <<'EOF'
+mkdir -p "$TARGET_HOME/.config/alacritty"
+cat > "$TARGET_HOME/.config/alacritty/alacritty.toml" <<'EOF'
 [window]
 opacity = 0.5
 
@@ -1043,8 +1058,8 @@ EOF
 # --------------------------------
 # Automatic Screen Locking Toggle
 # --------------------------------
-mkdir -p ~/.local/bin
-cat > ~/.local/bin/lock_toggle.sh <<'EOF'
+mkdir -p "$TARGET_HOME/.local/bin"
+cat > "$TARGET_HOME/.local/bin/lock_toggle.sh" <<'EOF'
 #!/bin/bash
 
 get_real_status() {
@@ -1077,12 +1092,12 @@ case "$1" in
         ;;
 esac
 EOF
-chmod +x ~/.local/bin/lock_toggle.sh
+chmod +x "$TARGET_HOME/.local/bin/lock_toggle.sh"
 
 # ------------------
 # Cheat sheet for keybindings
 # ------------------
-cat > ~/.local/bin/toggle-cheatsheet.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/toggle-cheatsheet.sh" <<'EOF'
 #!/bin/bash
 
 CHEATSHEET_TITLE="Hyprland Cheatsheet"
@@ -1098,12 +1113,12 @@ else
     "$TERMINAL" --class "cheatsheet" --title "$CHEATSHEET_TITLE" -e less "$CHEATSHEET_FILE" &
 fi
 EOF
-chmod +x ~/.local/bin/toggle-cheatsheet.sh
+chmod +x "$TARGET_HOME/.local/bin/toggle-cheatsheet.sh"
 
 # ------------------
 # Wofi toggle
 # ------------------
-cat > ~/.local/bin/toggle-wofi.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/toggle-wofi.sh" <<'EOF'
 #!/bin/bash
 
 # Check if Wofi is already running
@@ -1115,12 +1130,12 @@ else
     wofi --show drun --height=325 --width=625 --insensitive --allow-images
 fi
 EOF
-chmod +x ~/.local/bin/toggle-wofi.sh
+chmod +x "$TARGET_HOME/.local/bin/toggle-wofi.sh"
 
 # ------------------
 # Wofi toggle
 # ------------------
-cat > ~/.local/bin/toggle-animations.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/toggle-animations.sh" <<'EOF'
 #!/bin/bash
 
 STATE_FILE="$HOME/.cache/hypr_animations_state"
@@ -1143,12 +1158,12 @@ else
     hyprctl notify -1 1000 "rgb(98c379)" "Animations on"
 fi
 EOF
-chmod +x ~/.local/bin/toggle-animations.sh
+chmod +x "$TARGET_HOME/.local/bin/toggle-animations.sh"
 
 # ------------------
 # Dynamic workspace functionality (if workspace doesn't exist, create it)
 # ------------------
-cat > ~/.local/bin/dynamic-workspaces.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/dynamic-workspaces.sh" <<'EOF'
 #!/bin/bash
 
 direction=$1
@@ -1161,9 +1176,9 @@ else
     exit 1
 fi
 EOF
-chmod +x ~/.local/bin/dynamic-workspaces.sh
+chmod +x "$TARGET_HOME/.local/bin/dynamic-workspaces.sh"
 
-cat > ~/.local/bin/brightness-control.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/brightness-control.sh" <<'EOF'
 #!/bin/bash
 STEP=25
 ACTION=$1
@@ -1178,12 +1193,12 @@ for display in $(ddcutil detect --terse | grep -o 'Display [0-9]*' | awk '{print
   ddcutil --display "$display" setvcp 10 "$ACTION" "$STEP" --noverify
 done
 EOF
-chmod +x ~/.local/bin/brightness-control.sh
+chmod +x "$TARGET_HOME/.local/bin/brightness-control.sh"
 
 # ------------------
 # Wallpaper Settings
 # ------------------
-cat > ~/.local/bin/set-wallpaper.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/set-wallpaper.sh" <<'EOF'
 #!/bin/bash
 
 # If wofi is already opened, close it
@@ -1234,12 +1249,12 @@ if [ -n "$CHOICE" ]; then
     $RELOAD_CMD
 fi
 EOF
-chmod +x ~/.local/bin/set-wallpaper.sh
+chmod +x "$TARGET_HOME/.local/bin/set-wallpaper.sh"
 
 # ------------------
 # Display Settings
 # ------------------
-cat > ~/.local/bin/display-settings.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/display-settings.sh" <<'EOF'
 #!/bin/bash
 
 # If wofi is already opened, close it
@@ -1277,12 +1292,12 @@ if [ "$confirm" == "yes" ]; then
     echo "monitor=$chosen_output, $chosen_mode, 0x0, 1" >> "$CONFIG"
 fi
 EOF
-chmod +x ~/.local/bin/display-settings.sh
+chmod +x "$TARGET_HOME/.local/bin/display-settings.sh"
 
 # ------------------
 # Screenshots
 # ------------------
-cat > ~/.local/bin/screenshot.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/screenshot.sh" <<'EOF'
 #!/bin/bash
 
 # If wofi is already opened, close it
@@ -1348,12 +1363,12 @@ mv /tmp/screenshot.png "$TARGET"
 # Notify user
 notify-send "Screenshot saved" "$TARGET"
 EOF
-chmod +x ~/.local/bin/screenshot.sh
+chmod +x "$TARGET_HOME/.local/bin/screenshot.sh"
 
 # ------------------------
 # Changing power profiles
 # ------------------------
-cat > ~/.local/bin/power-profiles.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/power-profiles.sh" <<'EOF'
 #!/bin/bash
 
 # Get current profile
@@ -1370,9 +1385,9 @@ if [ -n "$CHOICE" ] && [ "$CHOICE" != "current: $CURRENT" ]; then
     powerprofilesctl set "$CHOICE" && notify-send "Power Profile" "Set to $CHOICE"
 fi
 EOF
-chmod +x ~/.local/bin/power-profiles.sh
+chmod +x "$TARGET_HOME/.local/bin/power-profiles.sh"
 
-cat > ~/.local/bin/account-management.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/account-management.sh" <<'EOF'
 #!/bin/bash
 
 # If wofi is already opened, close it
@@ -1537,17 +1552,17 @@ while true; do
     esac
 done
 EOF
-chmod +x ~/.local/bin/account-management.sh
+chmod +x "$TARGET_HOME/.local/bin/account-management.sh"
 
-cat > ~/.local/bin/theme-env.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/theme-env.sh" <<'EOF'
 [ -f "$HOME/.dircolors" ] && eval "$(dircolors "$HOME/.dircolors")"
 EOF
-chmod +x ~/.local/bin/theme-env.sh
+chmod +x "$TARGET_HOME/.local/bin/theme-env.sh"
 
 # ------------------------
 # Theme Switcher
 # ------------------------
-cat > ~/.local/bin/theme-switcher.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/theme-switcher.sh" <<'EOF'
 #!/bin/bash
 
 # --- Toggle Wofi ---
@@ -1754,12 +1769,12 @@ case "$CHOICE" in
         ;;
 esac
 EOF
-chmod +x ~/.local/bin/theme-switcher.sh
+chmod +x "$TARGET_HOME/.local/bin/theme-switcher.sh"
 
 # ------------------------------------------
 # Managing Peripherals (mouse and touchpad)
 # ------------------------------------------
-cat > ~/.local/bin/input-config.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/input-config.sh" <<'EOF'
 #!/bin/bash
 
 # If wofi is already opened, close it
@@ -1842,9 +1857,9 @@ case "$OPTION" in
         ;;
 esac
 EOF
-chmod +x ~/.local/bin/input-config.sh
+chmod +x "$TARGET_HOME/.local/bin/input-config.sh"
 
-cat > ~/.config/hypr/hyprland.conf <<'EOF'
+cat > "$TARGET_HOME/.config/hypr/hyprland.conf" <<'HYPRCONF'
 # ================================
 # MOD KEYS
 # ================================
@@ -2018,7 +2033,7 @@ bind = $mod SHIFT, Q, exec, ~/.local/bin/power-menu.sh
 bind = $mod SHIFT, A, exec, ~/.local/bin/account-management.sh
 
 # Lock the screen (Mod + Ctrl + Shift + L)
-bind = $mod CTRL SHIFT, L, exec, LOCK_WALLPAPER=$(cat /home/fatihthedev/.cache/lastwallpaper) hyprlock
+bind = $mod CTRL SHIFT, L, exec, LOCK_WALLPAPER=$(cat $HOME/.cache/lastwallpaper) hyprlock
 
 # Open task manager (Mod + Shift + Esc)
 bind = CTRL SHIFT, ESCAPE, exec, lxtask
@@ -2199,9 +2214,9 @@ bind = $mod SHIFT, X, exec, ~/.local/bin/toggle-animations.sh
 # Wallpaper and Display settings
 # ==================================
 exec = swaybg -i $HOME/Pictures/Wallpapers/dragon.jpg -m fill
-EOF
+HYPRCONF
 
-cat > ~/.config/hypr/cheatsheet.txt <<'EOF'
+cat > "$TARGET_HOME/.config/hypr/cheatsheet.txt" <<'EOF'
 
                                    HYPRLAND WINDOW MANAGER KEYBINDINGS CHEATSHEET  
      (Quick reference for essential Hyprland controls — you can modify all bindings in ~/.config/hypr/hyprland.conf file.)  
@@ -2282,27 +2297,27 @@ EOF
 echo "[11/15] Configuring Wofi..."
 
 # Setting Papirus icon theme as default
-mkdir -p ~/.config/gtk-3.0
-if [[ ! -f ~/.config/gtk-3.0/settings.ini ]]; then
+mkdir -p "$TARGET_HOME/.config/gtk-3.0"
+if [[ ! -f "$TARGET_HOME/.config/gtk-3.0/settings.ini" ]]; then
     # File does not exist → create it with header and key
-    cat > ~/.config/gtk-3.0/settings.ini <<'EOF'
+    cat > "$TARGET_HOME/.config/gtk-3.0/settings.ini" <<'EOF'
 [Settings]
 gtk-icon-theme-name=Papirus-Dark
 gtk-application-prefer-dark-theme=1
 EOF
 else
     # File exists → ensure it has [Settings], then add key if missing
-    if ! grep -q "^\[Settings\]" ~/.config/gtk-3.0/settings.ini; then
-        sed -i '1i [Settings]' ~/.config/gtk-3.0/settings.ini
+    if ! grep -q "^\[Settings\]" "$TARGET_HOME/.config/gtk-3.0/settings.ini"; then
+        sed -i '1i [Settings]' "$TARGET_HOME/.config/gtk-3.0/settings.ini"
     fi
 
-    grep -qxF "gtk-icon-theme-name=Papirus-Dark" ~/.config/gtk-3.0/settings.ini 2>/dev/null || \
-    echo "gtk-icon-theme-name=Papirus-Dark" >> ~/.config/gtk-3.0/settings.ini
+    grep -qxF "gtk-icon-theme-name=Papirus-Dark" "$TARGET_HOME/.config/gtk-3.0/settings.ini" 2>/dev/null || \
+    echo "gtk-icon-theme-name=Papirus-Dark" >> "$TARGET_HOME/.config/gtk-3.0/settings.ini"
 fi
 
-mkdir -p ~/.config/wofi
+mkdir -p "$TARGET_HOME/.config/wofi"
 # Main config (functional options)
-cat > ~/.config/wofi/config <<'EOF'
+cat > "$TARGET_HOME/.config/wofi/config" <<'EOF'
 [wofi]
 show=drun
 allow-images=true
@@ -2312,7 +2327,7 @@ term=alacritty
 EOF
 
 # Style (GTK CSS selectors)
-cat > ~/.config/wofi/style.css <<'EOF'
+cat > "$TARGET_HOME/.config/wofi/style.css" <<'EOF'
 #window {
   border: 1px solid #1e1e2e;
   background-color: #1e1e2e;
@@ -2358,7 +2373,7 @@ EOF
 # Power menu script
 # -----------------------
 echo "[12/15] Creating power menu script..."
-cat > ~/.local/bin/power-menu.sh <<'EOF'
+cat > "$TARGET_HOME/.local/bin/power-menu.sh" <<'EOF'
 #!/bin/bash
 
 # If wofi is already opened, close it
@@ -2382,7 +2397,7 @@ case "$choice" in
         ;;
 esac
 EOF
-chmod +x ~/.local/bin/power-menu.sh
+chmod +x "$TARGET_HOME/.local/bin/power-menu.sh"
 
 flatpak install --noninteractive --assumeyes flathub org.gnome.NetworkDisplays || true
 flatpak install --noninteractive --assumeyes flathub org.onlyoffice.desktopeditors || true
@@ -2393,15 +2408,20 @@ flatpak install --noninteractive --assumeyes flathub org.kde.krita || true
 # Default brightness and external monitors brightness control setting
 # --------------------------------------------------------------------
 echo "[14/15] Setting default brightness to 15%..."
-brightnessctl set 15%
-for bus in $(ddcutil detect --brief | grep -o 'I2C bus: .*' | grep -o '[0-9]*'); do
+brightnessctl set 15% 2>/dev/null || true
+for bus in $(ddcutil detect --brief 2>/dev/null | grep -o 'I2C bus: .*' | grep -o '[0-9]*'); do
   ddcutil --bus=$bus setvcp 10 15 || true
 done
-sudo usermod -aG video $USER
-sudo usermod -aG i2c $USER
+sudo usermod -aG video "$TARGET_USER"
+sudo usermod -aG i2c "$TARGET_USER"
 echo 'KERNEL=="i2c-[0-9]*", GROUP="i2c", MODE="0660"' | sudo tee /etc/udev/rules.d/45-ddcutil-i2c.rules
 echo 'i2c-dev' | sudo tee /etc/modules-load.d/i2c-dev.conf
 sudo udevadm control --reload-rules && sudo udevadm trigger
+
+# Fix ownership when run as root (e.g. from installation.sh chroot)
+if [[ "$(whoami)" == "root" ]] && [[ -n "$TARGET_USER" ]]; then
+    chown -R "$TARGET_USER:$(id -gn "$TARGET_USER")" "$TARGET_HOME/.config" "$TARGET_HOME/.local" "$TARGET_HOME/Desktop" "$TARGET_HOME/Code" "$TARGET_HOME/Documents" "$TARGET_HOME/Downloads" "$TARGET_HOME/Pictures" "$TARGET_HOME/Videos" "$TARGET_HOME/.profile" 2>/dev/null || true
+fi
 
 echo "[15/15] Final touches and reminders..."
 echo "✅ Setup complete!"
