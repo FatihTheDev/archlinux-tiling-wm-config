@@ -76,14 +76,23 @@ INPUT_FILE="$CONFIG_DIR/input.conf"
 mkdir -p "$CONFIG_DIR"
 
 cat > "$CONFIG_FILE" <<'EOF'
+; Enable hardware video acceleration by default
 hwdec=auto
 vo=gpu
+
+; Increase maximum volume to 150%
+volume-max=150
 EOF
 
 # input.conf for volume control via arrow keys
 cat > "$INPUT_FILE" <<'EOF'
+# UP/DOWN arrow keys to increase/decrease volume by 5%
 UP add volume 5
 DOWN add volume -5
+
+# CTRL + LEFT/RIGHT arrow keys to go back/forward by 1 minute
+Ctrl+RIGHT seek 60
+Ctrl+LEFT seek -60
 EOF
 
 gsettings set io.github.celluloid-player.Celluloid mpv-config-enable true
