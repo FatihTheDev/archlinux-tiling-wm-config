@@ -43,7 +43,8 @@ sudo pacman -S --noconfirm sddm firewalld hyprland swaybg hyprlock hypridle wayb
     proton-vpn-gtk-app torbrowser-launcher lxtask mate-calc gsimplecal ncdu downgrade gammastep cliphist gnome-font-viewer mousepad autotiling net-tools \
     nmap hping wireshark-qt tor-router bettercap || true
 
-yay -S --noconfirm masterpdfeditor-free wayscriber-bin || true
+# Run yay as the target user (yay doesn't allow running as root)
+runuser -u "$TARGET_USER" -- yay -S --noconfirm masterpdfeditor-free wayscriber-bin || true
 
 
 mkdir -p "$TARGET_HOME/Desktop"
@@ -62,10 +63,17 @@ sudo systemctl enable sddm
 sudo usermod -aG wireshark "$TARGET_USER"
 
 # Start firewall and enable port necessary for Localsend
-sudo systemctl enable --now firewalld
-sudo firewall-cmd --permanent --add-port=53317/tcp
-sudo firewall-cmd --permanent --add-port=53317/udp
-sudo firewall-cmd --reload
+# Enable firewalld (without --now for chroot compatibility)
+sudo systemctl enable firewalld
+# Start firewalld if systemd is running (not in chroot)
+if systemctl is-system-running >/dev/null 2>&1; then
+    sudo systemctl start firewalld
+fi
+# Configure firewall ports (firewall-cmd works even if service isn't fully started)
+sudo firewall-cmd --permanent --add-port=53317/tcp 2>/dev/null || true
+sudo firewall-cmd --permanent --add-port=53317/udp 2>/dev/null || true
+# Reload firewall configuration
+sudo firewall-cmd --reload 2>/dev/null || true
 
 # Whenever ethernet network interface is reconnected, change its mac address (for more anonimity)
 sudo tee /etc/NetworkManager/conf.d/99-random-mac.conf > /dev/null <<'EOF'
