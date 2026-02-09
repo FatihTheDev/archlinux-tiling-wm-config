@@ -30,34 +30,6 @@ else
 fi
 export TARGET_USER TARGET_HOME
 
-# 5. Make pacman/yay more resilient to slow mirrors and timeouts
-setup_pacman_downloads() {
-    if [[ ! -f /etc/pacman.conf ]]; then
-        return 0
-    fi
-
-    # Avoid \"Less than 1 byte/sec\" aborts
-    if ! grep -q '^DisableDownloadTimeout' /etc/pacman.conf; then
-        sudo sed -i '/^\\[options\\]/a DisableDownloadTimeout' /etc/pacman.conf
-    fi
-
-    # Use a transfer command with retries and long timeouts
-    if ! grep -q '^XferCommand' /etc/pacman.conf; then
-        local insert_after='^\\[options\\]'
-        if grep -q '^DisableDownloadTimeout' /etc/pacman.conf; then
-            insert_after='^DisableDownloadTimeout'
-        fi
-        if command -v curl &>/dev/null; then
-            sudo sed -i \"/${insert_after}/a XferCommand = /usr/bin/curl -C - -f -L --retry 5 --retry-delay 5 --connect-timeout 120 --max-time 0 -o %o %u\" /etc/pacman.conf
-        elif command -v wget &>/dev/null; then
-            sudo sed -i \"/${insert_after}/a XferCommand = /usr/bin/wget --timeout=120 --tries=5 -c -q -O %o %u\" /etc/pacman.conf
-        fi
-    fi
-}
-
-echo "[0/15] Preparing pacman for slow networks..."
-setup_pacman_downloads
-
 echo "[1/15] Updating system..."
 sudo pacman -Syu --noconfirm
 
@@ -69,7 +41,7 @@ sudo pacman -S --noconfirm sddm firewalld hyprland swaybg hyprlock hypridle wayb
     nwg-look nwg-clipman qimgv thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar udiskie \
     playerctl celluloid ocean-sound-theme swaync swayosd libnotify inotify-tools ddcutil i2c-tools brightnessctl polkit-gnome power-profiles-daemon fd fzf \
     proton-vpn-gtk-app torbrowser-launcher lxtask mate-calc gsimplecal ncdu downgrade gammastep cliphist gnome-font-viewer mousepad autotiling net-tools \
-    nmap hping wireshark-qt tor-router bettercap || true
+	nmap hping wireshark-qt tor-router bettercap || true
 
 yay -S --noconfirm masterpdfeditor-free wayscriber-bin || true
 
