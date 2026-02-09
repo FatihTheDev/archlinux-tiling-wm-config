@@ -86,7 +86,7 @@ ethernet.cloned-mac-address=random
 EOF
 
 
-# Enabling automatic hardware video acceleration for mpv and setting it to be by default in Celluloid
+# Enabling automatic hardware video acceleration for mpv
 CONFIG_DIR="$TARGET_HOME/.config/mpv"
 CONFIG_FILE="$CONFIG_DIR/mpv.conf"
 INPUT_FILE="$CONFIG_DIR/input.conf"
@@ -112,12 +112,6 @@ DOWN add volume -5
 Ctrl+RIGHT seek 60
 Ctrl+LEFT seek -60
 EOF
-
-runuser -u "$TARGET_USER" -- env "HOME=$TARGET_HOME" gsettings set io.github.celluloid-player.Celluloid mpv-config-enable true 2>/dev/null || true
-runuser -u "$TARGET_USER" -- env "HOME=$TARGET_HOME" gsettings set io.github.celluloid-player.Celluloid mpv-config-file "file://$TARGET_HOME/.config/mpv/mpv.conf" 2>/dev/null || true
-runuser -u "$TARGET_USER" -- env "HOME=$TARGET_HOME" gsettings set io.github.celluloid-player.Celluloid mpv-input-config-enable true 2>/dev/null || true
-runuser -u "$TARGET_USER" -- env "HOME=$TARGET_HOME" gsettings set io.github.celluloid-player.Celluloid mpv-input-config-file "file://$TARGET_HOME/.config/mpv/input.conf" 2>/dev/null || true
-
 
 mkdir -p "$TARGET_HOME/.config"
 
@@ -1949,6 +1943,12 @@ exec-once = gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 exec-once = gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
 exec-once = gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 
+# Celluloid media player mpv config
+exec-once = gsettings set io.github.celluloid-player.Celluloid mpv-config-enable true
+exec-once = gsettings set io.github.celluloid-player.Celluloid mpv-config-file "file://$HOME/.config/mpv/mpv.conf"
+exec-once = gsettings set io.github.celluloid-player.Celluloid mpv-input-config-enable true
+exec-once = gsettings set io.github.celluloid-player.Celluloid mpv-input-config-file "file://$HOME/.config/mpv/input.conf"
+
 # GNOME Software Settings
 exec-once = gsettings set org.gnome.software download-updates false
 exec-once = gsettings set org.gnome.software check-interval 7   
@@ -2348,7 +2348,6 @@ cat > "$TARGET_HOME/.config/wofi/config" <<'EOF'
 [wofi]
 show=drun
 allow-images=true
-normal_window=true
 icon-theme=Papirus-Dark
 term=alacritty
 EOF
