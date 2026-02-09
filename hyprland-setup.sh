@@ -41,7 +41,7 @@ sudo pacman -S --noconfirm sddm firewalld hyprland swaybg hyprlock hypridle wayb
     nwg-look nwg-clipman qimgv thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar udiskie \
     playerctl celluloid ocean-sound-theme swaync swayosd libnotify inotify-tools ddcutil i2c-tools brightnessctl polkit-gnome power-profiles-daemon fd fzf \
     proton-vpn-gtk-app torbrowser-launcher lxtask mate-calc gsimplecal ncdu downgrade gammastep cliphist gnome-font-viewer mousepad autotiling net-tools \
-	nmap hping wireshark-qt tor-router bettercap || true
+    nmap hping wireshark-qt tor-router bettercap || true
 
 yay -S --noconfirm masterpdfeditor-free wayscriber-bin || true
 
@@ -349,6 +349,8 @@ fi
 # ---------------------------------------
 # Download default wallpapers
 # ---------------------------------------
+echo "[3/15] Downloading default wallpapers..."
+
 # Destination directory
 DEST_DIR="$TARGET_HOME/Pictures/Wallpapers"
 mkdir -p "$DEST_DIR"
@@ -360,10 +362,27 @@ IMAGES=(
     "https://raw.githubusercontent.com/FatihTheDev/archlinux-tiling-wm-config/main/recommended_wallpapers/dragon.jpg"
 )
 
-# Download each image
+# Download each image (fail-safe: try curl, then wget)
 for URL in "${IMAGES[@]}"; do
-    curl -L "$URL" -o "$DEST_DIR/$(basename $URL)" || true
+    FILE_NAME="$(basename "$URL")"
+    TARGET_PATH="$DEST_DIR/$FILE_NAME"
+
+    if ! curl -fL "$URL" -o "$TARGET_PATH" 2>/dev/null; then
+        # Fallback to wget if curl fails for any reason
+        if command -v wget >/dev/null 2>&1; then
+            wget -qO "$TARGET_PATH" "$URL" || rm -f "$TARGET_PATH"
+        else
+            rm -f "$TARGET_PATH"
+        fi
+    fi
 done
+
+# Quick sanity check so it's obvious if something went wrong during install
+if ls "$DEST_DIR"/*.jpg >/dev/null 2>&1; then
+    echo "Wallpapers downloaded to $DEST_DIR"
+else
+    echo "WARNING: Failed to download wallpapers. Please check your network and rerun the wallpaper section of hyprland-setup.sh."
+fi
 
 # -----------------------
 # Audio system selection
