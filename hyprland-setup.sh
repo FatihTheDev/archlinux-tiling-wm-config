@@ -215,6 +215,169 @@ EOF
 HOME="$TARGET_HOME" bash /tmp/templates.sh
 rm -f /tmp/templates.sh
 
+# -------------------------------------
+# Custom SDDM theming
+# -------------------------------------
+cat > /tmp/sddm-theme.sh <<'EOF'
+#!/bin/bash
+
+# 1. Install dependencies
+echo "Installing dependencies for Telva Linux..."
+sudo pacman -S --noconfirm sddm qt5-graphicaleffects qt5-quickcontrols2 qt5-wayland
+
+# 2. Setup directory
+TARGET_DIR="/usr/share/sddm/themes/telva"
+sudo mkdir -p "$TARGET_DIR"
+
+# 3. Create the Custom Main.qml
+sudo bash -c "cat > $TARGET_DIR/Main.qml << 'EOF'
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
+
+Rectangle {
+    id: container
+    width: 1920
+    height: 1080
+    color: \"#050505\"
+
+    ColumnLayout {
+        anchors.centerIn: parent
+        spacing: 30
+
+        Text {
+            text: \"TELVA LINUX\"
+            color: \"#e0e0e0\"
+            font.pixelSize: 48
+            font.letterSpacing: 10
+            font.weight: Font.ExtraLight
+            Layout.alignment: Qt.AlignHCenter
+        }
+
+        ColumnLayout {
+            spacing: 12
+            Layout.alignment: Qt.AlignHCenter
+
+            // Username Dropdown
+            ComboBox {
+                id: userList
+                model: userModel
+                textRole: \"name\"
+                currentIndex: userModel.lastIndex
+                Layout.preferredWidth: 280
+                
+                delegate: ItemDelegate {
+                    width: userList.width
+                    text: model.name
+                    highlighted: userList.highlightedIndex === index
+                    contentItem: Text {
+                        text: parent.text
+                        color: \"#e0e0e0\"
+                        font.pixelSize: 14
+                        verticalAlignment: Text.AlignVCenter
+                        leftPadding: 10
+                    }
+                    background: Rectangle {
+                        color: parent.highlighted ? \"#2a2a2a\" : \"#1a1a1a\"
+                    }
+                }
+
+                contentItem: Text {
+                    text: userList.displayText // Arrow removed
+                    color: \"#e0e0e0\"
+                    font.pixelSize: 16
+                    leftPadding: 10
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                background: Rectangle {
+                    color: \"#1a1a1a\"
+                    border.color: \"#333333\"
+                    radius: 4
+                }
+            }
+
+            // Password Field
+            TextField {
+                id: password
+                placeholderText: \"Password\"
+                placeholderTextColor: \"#555555\"
+                echoMode: TextInput.Password
+                color: \"#e0e0e0\"
+                focus: true
+                Layout.preferredWidth: 280
+                
+                background: Rectangle {
+                    implicitHeight: 45
+                    color: \"#1a1a1a\"
+                    border.color: password.activeFocus ? \"#444444\" : \"#333333\"
+                    radius: 4
+                }
+
+                onAccepted: sddm.login(userList.currentText, password.text, sessionModel.lastIndex)
+            }
+        }
+
+        // Power Controls
+        RowLayout {
+            spacing: 25
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: 10
+
+            Button {
+                id: rebootBtn
+                text: \"REBOOT\"
+                onClicked: sddm.reboot()
+                contentItem: Text {
+                    text: rebootBtn.text
+                    color: rebootBtn.hovered ? \"#ffffff\" : \"#555555\"
+                    font.pixelSize: 11
+                    font.letterSpacing: 2
+                }
+                background: Rectangle { color: \"transparent\" }
+            }
+
+            Text { text: \"|\"; color: \"#222222\"; font.pixelSize: 12 }
+
+            Button {
+                id: shutBtn
+                text: \"SHUTDOWN\"
+                onClicked: sddm.powerOff()
+                contentItem: Text {
+                    text: shutBtn.text
+                    color: shutBtn.hovered ? \"#ffffff\" : \"#555555\"
+                    font.pixelSize: 11
+                    font.letterSpacing: 2
+                }
+                background: Rectangle { color: \"transparent\" }
+            }
+        }
+
+        Text {
+            text: \"Customization at your fingertips\"
+            color: \"#333333\"
+            font.pixelSize: 12
+            font.letterSpacing: 1
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: 15
+        }
+    }
+}
+EOF"
+
+# 4. Activate theme
+sudo mkdir -p /etc/sddm.conf.d
+sudo bash -c 'cat > /etc/sddm.conf.d/theme.conf << EOF
+[Theme]
+Current=telva
+EOF'
+
+echo "Telva Linux theme updated and ready."
+EOF
+
+HOME="$TARGET_HOME" bash /tmp/sddm-theme.sh
+rm -f /tmp/sddm-theme.sh
+
 # -------------------------------------------
 # Modifying preferences for Librewolf browser
 # -------------------------------------------
