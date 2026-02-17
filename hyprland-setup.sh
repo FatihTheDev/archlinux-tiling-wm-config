@@ -222,7 +222,7 @@ cat > /tmp/sddm-theme.sh <<'EOF'
 #!/bin/bash
 
 # 1. Install dependencies
-echo "Installing dependencies for Telva Linux..."
+echo "Installing dependencies for custom Telva Linux SDDM theme..."
 sudo pacman -S --noconfirm sddm qt5-graphicaleffects qt5-quickcontrols2 qt5-wayland
 
 # 2. Setup directory
@@ -240,6 +240,16 @@ Rectangle {
     width: 1920
     height: 1080
     color: \"#050505\"
+
+    // Connection to handle login failure
+    Connections {
+        target: sddm
+        function onLoginFailed() {
+            password.text = \"\"
+            errorAnimation.start()
+            password.focus = true
+        }
+    }
 
     ColumnLayout {
         anchors.centerIn: parent
@@ -283,7 +293,7 @@ Rectangle {
                 }
 
                 contentItem: Text {
-                    text: userList.displayText // Arrow removed
+                    text: userList.displayText
                     color: \"#e0e0e0\"
                     font.pixelSize: 16
                     leftPadding: 10
@@ -306,12 +316,37 @@ Rectangle {
                 color: \"#e0e0e0\"
                 focus: true
                 Layout.preferredWidth: 280
+                rightPadding: 80 // Space for the Caps Lock text
                 
                 background: Rectangle {
+                    id: passwordBackground
                     implicitHeight: 45
                     color: \"#1a1a1a\"
                     border.color: password.activeFocus ? \"#444444\" : \"#333333\"
+                    border.width: 1
                     radius: 4
+
+                    // Flash Red Animation
+                    SequentialAnimation on border.color {
+                        id: errorAnimation
+                        running: false
+                        ColorAnimation { to: \"#cc0000\"; duration: 200 }
+                        ColorAnimation { to: \"#cc0000\"; duration: 600 }
+                        ColorAnimation { to: \"#333333\"; duration: 200 }
+                    }
+                }
+
+                // Caps Lock Indicator Inside Field
+                Text {
+                    text: \"Caps Lock\"
+                    color: \"#aa3333\"
+                    font.pixelSize: 12
+                    font.bold: true
+                    anchors.right: parent.right
+                    anchors.rightMargin: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: keyboard.capsLock
+                    opacity: 0.7
                 }
 
                 onAccepted: sddm.login(userList.currentText, password.text, sessionModel.lastIndex)
@@ -372,7 +407,7 @@ sudo bash -c 'cat > /etc/sddm.conf.d/theme.conf << EOF
 Current=telva
 EOF'
 
-echo "Telva Linux theme updated and ready."
+echo "Telva Linux theme applied."
 EOF
 
 HOME="$TARGET_HOME" bash /tmp/sddm-theme.sh
