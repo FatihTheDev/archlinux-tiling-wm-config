@@ -551,6 +551,12 @@ fi
 # ---------------------------------------
 echo "[3/15] Downloading default wallpapers..."
 
+# Ensure curl or wget is available
+if ! command -v curl >/dev/null 2>&1 && ! command -v wget >/dev/null 2>&1; then
+    echo "Installing curl for wallpaper downloads..."
+    sudo pacman -S --noconfirm curl || sudo pacman -S --noconfirm wget || true
+fi
+
 # Destination directory
 DEST_DIR="$TARGET_HOME/Pictures/Wallpapers"
 mkdir -p "$DEST_DIR"
@@ -563,25 +569,47 @@ IMAGES=(
 )
 
 # Download each image (fail-safe: try curl, then wget)
+DOWNLOADED_COUNT=0
 for URL in "${IMAGES[@]}"; do
     FILE_NAME="$(basename "$URL")"
     TARGET_PATH="$DEST_DIR/$FILE_NAME"
+    
+    # Skip if file already exists
+    if [[ -f "$TARGET_PATH" ]]; then
+        echo "Skipping $FILE_NAME (already exists)"
+        DOWNLOADED_COUNT=$((DOWNLOADED_COUNT + 1))
+        continue
+    fi
 
-    if ! curl -fL "$URL" -o "$TARGET_PATH" 2>/dev/null; then
-        # Fallback to wget if curl fails for any reason
-        if command -v wget >/dev/null 2>&1; then
-            wget -qO "$TARGET_PATH" "$URL" || rm -f "$TARGET_PATH"
-        else
-            rm -f "$TARGET_PATH"
+    # Try curl first
+    if command -v curl >/dev/null 2>&1; then
+        if curl -fL "$URL" -o "$TARGET_PATH" 2>/dev/null && [[ -f "$TARGET_PATH" ]] && [[ -s "$TARGET_PATH" ]]; then
+            echo "Downloaded $FILE_NAME via curl"
+            DOWNLOADED_COUNT=$((DOWNLOADED_COUNT + 1))
+            continue
         fi
     fi
+    
+    # Fallback to wget
+    if command -v wget >/dev/null 2>&1; then
+        if wget -qO "$TARGET_PATH" "$URL" 2>/dev/null && [[ -f "$TARGET_PATH" ]] && [[ -s "$TARGET_PATH" ]]; then
+            echo "Downloaded $FILE_NAME via wget"
+            DOWNLOADED_COUNT=$((DOWNLOADED_COUNT + 1))
+            continue
+        fi
+    fi
+    
+    # If we get here, download failed
+    rm -f "$TARGET_PATH"
+    echo "WARNING: Failed to download $FILE_NAME"
 done
 
 # Quick sanity check so it's obvious if something went wrong during install
-if ls "$DEST_DIR"/*.jpg >/dev/null 2>&1; then
-    echo "Wallpapers downloaded to $DEST_DIR"
+if [[ $DOWNLOADED_COUNT -gt 0 ]]; then
+    echo "Successfully downloaded $DOWNLOADED_COUNT wallpaper(s) to $DEST_DIR"
 else
-    echo "WARNING: Failed to download wallpapers. Please check your network and rerun the wallpaper section of hyprland-setup.sh."
+    echo "WARNING: Failed to download wallpapers. Please check your network connection and ensure curl or wget is installed."
+    echo "You can manually download wallpapers from: https://github.com/FatihTheDev/archlinux-tiling-wm-config/tree/main/recommended_wallpapers"
 fi
 
 # -----------------------
