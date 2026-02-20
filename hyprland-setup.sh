@@ -2651,10 +2651,20 @@ esac
 EOF
 chmod +x "$TARGET_HOME/.local/bin/power-menu.sh"
 
+
+sudo tee /etc/sysctl.d/00-enable-unpriv-userns.conf > /dev/null <<'EOF'
+kernel.unprivileged_userns_clone=1
+EOF
+
+sudo chmod u+s $(which bwrap)
+
 flatpak install --noninteractive --assumeyes flathub org.gnome.NetworkDisplays || true
 flatpak install --noninteractive --assumeyes flathub org.onlyoffice.desktopeditors || true
 flatpak install --noninteractive --assumeyes flathub dev.vencord.Vesktop || true
 flatpak install --noninteractive --assumeyes flathub org.kde.krita || true
+
+sudo chmod u-s $(which bwrap)
+
 
 # --------------------------------------------------------------------
 # Default brightness and external monitors brightness control setting
