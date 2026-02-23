@@ -30,11 +30,18 @@ else
 fi
 export TARGET_USER TARGET_HOME
 
+# Extra pacman args when running from installation chroot
+PACMAN_EXTRA_ARGS=()
+if [[ -n "${INSTALL_USER:-}" ]]; then
+    PACMAN_EXTRA_ARGS+=(--disable-download-timeout)
+fi
+
 echo "[1/15] Updating system..."
-sudo pacman -Syu --noconfirm
+sudo pacman "${PACMAN_EXTRA_ARGS[@]}" -Syu --noconfirm
 
 echo "[2/15] Installing essential packages..."
-sudo pacman -S --noconfirm sddm firewalld hyprland swaybg hyprlock hypridle waybar socat wofi grim slurp wl-clipboard xorg-xwayland \
+sudo pacman "${PACMAN_EXTRA_ARGS[@]}" -S --noconfirm sddm firewalld hyprland swaybg hyprlock hypridle waybar socat wofi grim slurp wl-clipboard xorg-xwayland \
+    qt5-graphicaleffects qt5-quickcontrols2 qt5-wayland \
     xorg-xhost alacritty librewolf archlinux-appstream-data gnome-software neovim localsend obs-studio v4l2loopback-dkms obs-vaapi \
     networkmanager network-manager-applet nm-connection-editor xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-utils \
     ttf-font-awesome-4 noto-fonts papirus-icon-theme jq gnome-themes-extra adwaita-qt5-git adwaita-qt6-git qt5ct qt6ct \
@@ -221,11 +228,7 @@ rm -f /tmp/templates.sh
 cat > /tmp/sddm-theme.sh <<'EOF'
 #!/bin/bash
 
-# 1. Install dependencies
-echo "Installing dependencies for custom Telva Linux SDDM theme..."
-sudo pacman -S --noconfirm sddm qt5-graphicaleffects qt5-quickcontrols2 qt5-wayland
-
-# 2. Setup directory
+# 1. Setup directory (dependencies are installed earlier in hyprland-setup.sh)
 TARGET_DIR="/usr/share/sddm/themes/telva"
 sudo mkdir -p "$TARGET_DIR"
 
@@ -554,7 +557,7 @@ echo "[3/15] Downloading default wallpapers..."
 # Ensure curl or wget is available
 if ! command -v curl >/dev/null 2>&1 && ! command -v wget >/dev/null 2>&1; then
     echo "Installing curl for wallpaper downloads..."
-    sudo pacman -S --noconfirm curl || sudo pacman -S --noconfirm wget || true
+    sudo pacman "${PACMAN_EXTRA_ARGS[@]}" -S --noconfirm curl || sudo pacman "${PACMAN_EXTRA_ARGS[@]}" -S --noconfirm wget || true
 fi
 
 # Destination directory
@@ -616,7 +619,7 @@ fi
 # Audio system selection
 # -----------------------
 echo "[4/15] Installing audio system (PipeWire)..."
-sudo pacman -S --noconfirm pipewire pipewire-pulse wireplumber pavucontrol
+sudo pacman "${PACMAN_EXTRA_ARGS[@]}" -S --noconfirm pipewire pipewire-pulse wireplumber pavucontrol
 
 echo "[5/15] Enabling audio and desktop portal services..."
 runuser -u "$TARGET_USER" -- env "HOME=$TARGET_HOME" systemctl --user enable pipewire pipewire-pulse wireplumber xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland 2>/dev/null || \
@@ -635,7 +638,7 @@ mkdir -p "$TARGET_HOME/.local/share/applications"
 # install xdg-utils if missing (non-blocking)
 if ! command -v xdg-mime >/dev/null 2>&1; then
   echo "Installing xdg-utils..."
-  sudo pacman -S --noconfirm xdg-utils || true
+  sudo pacman "${PACMAN_EXTRA_ARGS[@]}" -S --noconfirm xdg-utils || true
 fi
 
 # Create fallback .desktop files (only if missing)
@@ -802,7 +805,7 @@ echo "Default applications set (user mimeapps.list written to $MIMEFILE)."
 # Bluetooth installation
 # -----------------------
 echo "[7/15] Installing Bluetooth stack and GUI..."
-sudo pacman -S --noconfirm bluez bluez-utils blueman
+sudo pacman "${PACMAN_EXTRA_ARGS[@]}" -S --noconfirm bluez bluez-utils blueman
 sudo systemctl enable bluetooth
 
 # ------------------------------------------------
@@ -2651,20 +2654,10 @@ esac
 EOF
 chmod +x "$TARGET_HOME/.local/bin/power-menu.sh"
 
-
-sudo tee /etc/sysctl.d/00-enable-unpriv-userns.conf > /dev/null <<'EOF'
-kernel.unprivileged_userns_clone=1
-EOF
-
-sudo chmod u+s $(which bwrap)
-
 flatpak install --noninteractive --assumeyes flathub org.gnome.NetworkDisplays || true
 flatpak install --noninteractive --assumeyes flathub org.onlyoffice.desktopeditors || true
 flatpak install --noninteractive --assumeyes flathub dev.vencord.Vesktop || true
 flatpak install --noninteractive --assumeyes flathub org.kde.krita || true
-
-sudo chmod u-s $(which bwrap)
-
 
 # --------------------------------------------------------------------
 # Default brightness and external monitors brightness control setting
