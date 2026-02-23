@@ -51,7 +51,7 @@ sudo pacman "${PACMAN_EXTRA_ARGS[@]}" -S --noconfirm sddm firewalld hyprland swa
     nmap bind hping wireshark-qt tor-router bettercap || true
 
 # Run yay as the target user (yay doesn't allow running as root)
-runuser -u "$TARGET_USER" -- yay -S --noconfirm masterpdfeditor-free wayscriber-bin || true
+runuser -u "$TARGET_USER" -- yay -S --noconfirm wayscriber-bin || true
 
 
 mkdir -p "$TARGET_HOME/Desktop"
@@ -706,7 +706,6 @@ application/x-shellscript=nvim.desktop
 text/html=librewolf.desktop
 x-scheme-handler/http=librewolf.desktop
 x-scheme-handler/https=librewolf.desktop
-application/pdf=masterpdfeditor4.desktop
 image/png=org.xfce.qimgv.desktop
 image/jpeg=org.xfce.qimgv.desktop
 image/jpg=org.xfce.qimgv.desktop
@@ -758,9 +757,6 @@ HOME="$TARGET_HOME" xdg-mime default librewolf.desktop text/xml || true
 HOME="$TARGET_HOME" xdg-mime default librewolf.desktop application/rss+xml || true
 HOME="$TARGET_HOME" xdg-mime default librewolf.desktop application/atom+xml || true
 
-# Pdf editor and viewer
-HOME="$TARGET_HOME" xdg-mime default masterpdfeditor4.desktop application/pdf || true
-
 # Video → Celluloid
 HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop video/mp4 || true
 HOME="$TARGET_HOME" xdg-mime default io.github.celluloid_player.Celluloid.desktop video/x-matroska || true
@@ -797,7 +793,6 @@ HOME="$TARGET_HOME" xdg-mime default org.xfce.mousepad.desktop text/plain || tru
 # Export env vars once (avoid duplicates)
 grep -qxF 'export BROWSER=librewolf' "$TARGET_HOME/.profile" 2>/dev/null || echo 'export BROWSER=librewolf' >> "$TARGET_HOME/.profile"
 grep -qxF 'export TERMINAL=alacritty' "$TARGET_HOME/.profile" 2>/dev/null || echo 'export TERMINAL=alacritty' >> "$TARGET_HOME/.profile"
-grep -qxF 'export DOCUMENT_VIEWER=masterpdfeditor4' "$TARGET_HOME/.profile" 2>/dev/null || echo 'export DOCUMENT_VIEWER=masterpdfeditor4' >> "$TARGET_HOME/.profile"
 
 echo "Default applications set (user mimeapps.list written to $MIMEFILE)."
 
