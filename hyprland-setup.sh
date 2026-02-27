@@ -63,6 +63,21 @@ mkdir -p "$TARGET_HOME/Pictures/Screenshots"
 mkdir -p "$TARGET_HOME/Pictures/Wallpapers"
 mkdir -p "$TARGET_HOME/Videos"
 
+# Change OS name to Telva Linux
+sudo tee /etc/os-release > /dev/null <<'EOF'
+NAME="Telva Linux"
+PRETTY_NAME="Telva Linux"
+ID=arch
+BUILD_ID=rolling
+ANSI_COLOR="38;2;150;75;0"
+HOME_URL="https://archlinux.org/"
+DOCUMENTATION_URL="https://wiki.archlinux.org/"
+SUPPORT_URL="https://bbs.archlinux.org/"
+BUG_REPORT_URL="https://gitlab.archlinux.org/groups/archlinux/-/issues"
+PRIVACY_POLICY_URL="https://terms.archlinux.org/docs/privacy-policy/"
+LOGO=archlinux-logo
+EOF
+
 # Enable sddm on startup
 sudo systemctl enable sddm
 
@@ -70,13 +85,9 @@ sudo systemctl enable sddm
 sudo usermod -aG wireshark "$TARGET_USER"
 
 # Start firewall and enable port necessary for Localsend
-# Enable firewalld (without --now for chroot compatibility)
 sudo systemctl enable firewalld
-# Start firewalld if systemd is running (not in chroot)
-if systemctl is-system-running >/dev/null 2>&1; then
-    sudo systemctl start firewalld
-fi
-# Configure firewall ports (firewall-cmd works even if service isn't fully started)
+
+# Configure firewall ports
 sudo firewall-cmd --permanent --add-port=53317/tcp 2>/dev/null || true
 sudo firewall-cmd --permanent --add-port=53317/udp 2>/dev/null || true
 # Reload firewall configuration
