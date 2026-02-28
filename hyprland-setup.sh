@@ -48,7 +48,7 @@ sudo pacman "${PACMAN_EXTRA_ARGS[@]}" -S --noconfirm sddm firewalld hyprland swa
     nwg-look nwg-clipman qimgv thunar thunar-archive-plugin thunar-volman gvfs engrampa zip unzip p7zip unrar udiskie \
     playerctl celluloid ocean-sound-theme swaync swayosd libnotify inotify-tools ddcutil i2c-tools brightnessctl polkit-gnome power-profiles-daemon fd fzf \
     proton-vpn-gtk-app torbrowser-launcher lxtask mate-calc gsimplecal ncdu downgrade gammastep cliphist gnome-font-viewer mousepad autotiling net-tools \
-    nmap bind hping wireshark-qt tor-router bettercap || true
+    nmap bind hping wireshark-qt tor-router bettercap
 
 # Run yay as the target user (yay doesn't allow running as root)
 runuser -u "$TARGET_USER" -- yay -S --noconfirm wayscriber-bin || true
