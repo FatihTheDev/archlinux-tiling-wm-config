@@ -78,6 +78,9 @@ PRIVACY_POLICY_URL="https://terms.archlinux.org/docs/privacy-policy/"
 LOGO=archlinux-logo
 EOF
 
+# Rebuild GRUB configuration to apply new name
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
 # Enable sddm on startup
 sudo systemctl enable sddm
 
