@@ -78,6 +78,9 @@ PRIVACY_POLICY_URL="https://terms.archlinux.org/docs/privacy-policy/"
 LOGO=archlinux-logo
 EOF
 
+# Make GRUB entry name Telva instead of Arch
+sudo sed -i 's/^GRUB_DISTRIBUTOR=.*/GRUB_DISTRIBUTOR="Telva"/' /etc/default/grub   
+
 # Rebuild GRUB configuration to apply new name
 sudo grub-mkconfig -o /boot/grub/grub.cfg
 
