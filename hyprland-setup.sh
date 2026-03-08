@@ -843,7 +843,7 @@ cat > "$TARGET_HOME/.config/waybar/config" <<'EOF'
 
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["clock"],
-    "modules-right": ["battery", "backlight", "pulseaudio", "hyprland/language", "custom/locktoggle", "tray", "custom/notifications"],
+    "modules-right": ["battery", "custom/powerprofiles", "backlight", "pulseaudio", "hyprland/language", "custom/locktoggle", "tray", "custom/notifications"],
 
     "hyprland": {
       "reconnect": true 
@@ -865,8 +865,15 @@ cat > "$TARGET_HOME/.config/waybar/config" <<'EOF'
       "states": {
         "warning": 20,
         "critical": 10
-      },
-      "on-click": "~/.local/bin/power-profiles.sh"
+      }
+    },
+
+    "custom/powerprofiles": {
+      "format": "<span font='Font Awesome 6 Free'>{icon}</span>",
+      "format-icons": ["\uf2dd"],
+      "on-click": "~/.local/bin/power-profiles.sh",
+      "tooltip": true,
+      "tooltip-format": "Power Profiles"
     },
 
     "pulseaudio": {
@@ -982,6 +989,7 @@ window#waybar {
 
 /* Padding for modules */
 #battery,
+#custom-powerprofiles,
 #pulseaudio,
 #network,
 #bluetooth,
