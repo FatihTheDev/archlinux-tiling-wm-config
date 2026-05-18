@@ -2141,10 +2141,6 @@ cat > "$TARGET_HOME/.config/hypr/hyprland.conf" <<'HYPRCONF'
 $mod = ALT
 
 
-# VFR = Variable Frame Rate - Reduce frame rendering when screen is static (set it to true to reduce power consumption)
-# Set it to false if you experience lag when resizing windows or if monitor flickers due to rapid refresh rate changes
-misc:vfr = true
-
 # Set this to true if you want to enable blur effect and false if you want to disable it (looks cool, but draws more power)
 decoration:blur:enabled = false
 
