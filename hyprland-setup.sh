@@ -1248,6 +1248,10 @@ window#osd progress {
 window#osd image {
   color: #3a5f9e;
 }
+
+window#osd label {
+  color: #bcbcbc;
+}
 EOF
 
 # ---------------------
