@@ -2562,6 +2562,7 @@ cat > "$TARGET_HOME/.config/hypr/cheatsheet.txt" <<'EOF'
                         Mod + T ....................... Theme switcher
                         Mod + Shift + W ............... Wallpaper picker (from ~/Pictures/Wallpapers)
                         Mod + Shift + X ............... Toggle window animations
+                        Mod + Shift + T ............... Colorscheme, icons and cursor selection (nwg-look)
 
                     ================================================================================
                                                   MISCELLANEOUS
