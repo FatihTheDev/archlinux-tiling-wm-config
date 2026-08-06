@@ -2819,7 +2819,7 @@ case "$choice" in
         systemctl reboot
         ;;
     "Logout")
-        hyprctl dispatch exit
+        hyprctl dispatch "hl.dsp.exit()"
         ;;
 esac
 EOF
