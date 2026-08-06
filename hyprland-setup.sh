@@ -2222,7 +2222,7 @@ hl.config({
         layout = "dwindle",
         -- Active window border color
         col = {
-            active_border = "rgba(80b8f0ee)",
+            active_border = "rgba(a080ccee)",
         },
     },
 })
@@ -2357,11 +2357,11 @@ hl.bind(mod .. " + " .. "V", hl.dsp.exec_cmd("nwg-clipman"))
 
 -- Close Window (Mod + Q)
 
-hl.bind(mod .. " + " .. "Q", hl.dsp.window.close())
+hl.bind(mod .. " + Q", hl.dsp.window.close())
 
 -- Make window full-screen (Mod + F)
 
-hl.bind(mod .. " + " .. "F", hl.dsp.window.fullscreen())
+hl.bind(mod .. " + F", hl.dsp.window.fullscreen())
 
 -- Toggle window between floating and tiling mode (Mod + Shift + Space)
 
@@ -2369,41 +2369,28 @@ hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "SPACE", hl.dsp.window.float())
 
 -- Move tiling windows around (with Mod + Shift + H,J,K,L) [Vim Keybinds]
 
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "H", hl.dsp.focus({ direction = "l" }))
-
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "J", hl.dsp.focus({ direction = "d" }))
-
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "K", hl.dsp.focus({ direction = "u" }))
-
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "L", hl.dsp.focus({ direction = "r" }))
-
--- Move floating windows around (with Mod + Shift + H,J,K,L)
-
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "H", hl.dsp.window.move({ x = -100, y = 0, relative = true }))
-
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "L", hl.dsp.window.move({ x = 100, y = 0, relative = true }))
-
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "K", hl.dsp.window.move({ x = 0, y = -100, relative = true }))
-
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "J", hl.dsp.window.move({ x = 0, y = 100, relative = true }))
+hl.bind(mod .. " + SHIFT + H", hl.dsp.window.move({ direction = "left" }))
+hl.bind(mod .. " + SHIFT + J", hl.dsp.window.move({ direction = "down" }))
+hl.bind(mod .. " + SHIFT + K", hl.dsp.window.move({ direction = "up" }))
+hl.bind(mod .. " + SHIFT + L", hl.dsp.window.move({ direction = "right" }))
 
 -- Move focus between windows (with Mod + H,J,K,L or Mod + Arrow Keys)
 
-hl.bind(mod .. " + " .. "H", hl.dsp.focus({ direction = "left" }))
+hl.bind(mod .. " + H", hl.dsp.focus({ direction = "left" }))
 
-hl.bind(mod .. " + " .. "L", hl.dsp.focus({ direction = "right" }))
+hl.bind(mod .. " + L", hl.dsp.focus({ direction = "right" }))
 
-hl.bind(mod .. " + " .. "K", hl.dsp.focus({ direction = "up" }))
+hl.bind(mod .. " + K", hl.dsp.focus({ direction = "up" }))
 
-hl.bind(mod .. " + " .. "J", hl.dsp.focus({ direction = "down" }))
+hl.bind(mod .. " + J", hl.dsp.focus({ direction = "down" }))
 
-hl.bind(mod .. " + " .. "LEFT", hl.dsp.focus({ direction = "left" }))
+hl.bind(mod .. " + LEFT", hl.dsp.focus({ direction = "left" }))
 
-hl.bind(mod .. " + " .. "RIGHT", hl.dsp.focus({ direction = "right" }))
+hl.bind(mod .. " + RIGHT", hl.dsp.focus({ direction = "right" }))
 
-hl.bind(mod .. " + " .. "UP", hl.dsp.focus({ direction = "up" }))
+hl.bind(mod .. " + UP", hl.dsp.focus({ direction = "up" }))
 
-hl.bind(mod .. " + " .. "DOWN", hl.dsp.focus({ direction = "down" }))
+hl.bind(mod .. " + DOWN", hl.dsp.focus({ direction = "down" }))
 
 -- Mod + Left Mouse Button Drag to move windows around
 
@@ -2421,13 +2408,22 @@ hl.gesture({ fingers = 4, direction = "horizontal", action = "workspace" })
 
 -- Zoom in and out with Mod + Plus / Mod + Minus
 
-hl.bind(mod .. " + " .. "minus", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor| grep float| awk ' { print $ 2- 0.1 } ')"), { repeating = true })
+local current_zoom = 1.0
 
-hl.bind(mod .. " + " .. "plus", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor| grep float| awk ' { print $ 2+ 0.1 } ')"), { repeating = true })
+local function adjust_zoom(delta)
+    current_zoom = math.max(1.0, current_zoom + delta)
+    hl.config({
+        cursor = {
+            zoom_factor = current_zoom
+        }
+    })
+end
 
-hl.bind(mod .. " + " .. "KP_Subtract", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor| grep float| awk ' { print $ 2- 0.1 } ')"), { repeating = true })
-
-hl.bind(mod .. " + " .. "KP_Add", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor| grep float| awk ' { print $ 2+ 0.1 } ')"), { repeating = true })
+-- Keybindings using direct Lua callbacks
+hl.bind(mod .. " + minus",       function() adjust_zoom(-0.1) end, { repeating = true })
+hl.bind(mod .. " + plus",        function() adjust_zoom(0.1)  end, { repeating = true })
+hl.bind(mod .. " + KP_Subtract", function() adjust_zoom(-0.1) end, { repeating = true })
+hl.bind(mod .. " + KP_Add",      function() adjust_zoom(0.1)  end, { repeating = true })
 
 -- ================================
 -- RESIZE MODE
@@ -2435,7 +2431,7 @@ hl.bind(mod .. " + " .. "KP_Add", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_f
 
 -- Enter resize mode (Mod + R) [close by pressing ESC or ENTER]
 
-hl.bind(mod .. " + " .. "R", hl.dsp.submap("resize"))
+hl.bind(mod .. " + R", hl.dsp.submap("resize"))
 
 -- Use H,J,K,L or Arrow Keys when in resize mode to resize currently focused window
 
@@ -2523,11 +2519,11 @@ hl.bind(mod .. " + SHIFT + Tab", hl.dsp.focus({ monitor = "-1" }))
 
 -- Mod + N to toggle the notification/control center
 
-hl.bind(mod .. " + " .. "N", hl.dsp.exec_cmd("swaync-client -t"))
+hl.bind(mod .. " + N", hl.dsp.exec_cmd("swaync-client -t"))
 
 -- Mod + Shift + N to close all notifications
 
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "N", hl.dsp.exec_cmd("swaync-client -C"))
+hl.bind(mod .. " + SHIFT + N", hl.dsp.exec_cmd("swaync-client -C"))
 
 -- ================================
 -- VOLUME CONTROL
@@ -2551,15 +2547,15 @@ hl.bind("XF86AudioMute", hl.dsp.exec_cmd("swayosd-client --output-volume mute-to
 
 -- Raise volume by 5%, maximum volume is 155% (set to any value you want)
 
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "RIGHT", hl.dsp.exec_cmd("swayosd-client --output-volume 5 --max-volume 155"), { repeating = true })
+hl.bind(mod .. " + SHIFT + RIGHT", hl.dsp.exec_cmd("swayosd-client --output-volume 5 --max-volume 155"), { repeating = true })
 
 -- Lower volume by 5%, maximum volume is 155% (set to any value you want)
 
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "LEFT", hl.dsp.exec_cmd("swayosd-client --output-volume -5 --max-volume 155"), { repeating = true })
+hl.bind(mod .. " + SHIFT + LEFT", hl.dsp.exec_cmd("swayosd-client --output-volume -5 --max-volume 155"), { repeating = true })
 
 -- Mute volume
 
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "M", hl.dsp.exec_cmd("swayosd-client --output-volume mute-toggle"))
+hl.bind(mod .. " + SHIFT + M", hl.dsp.exec_cmd("swayosd-client --output-volume mute-toggle"))
 
 -- ================================
 -- BRIGHTNESS CONTROL
@@ -2579,17 +2575,17 @@ hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("swayosd-client --brightness -5
 
 -- Raise brightness by 5%
 
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "UP", hl.dsp.exec_cmd("swayosd-client --brightness +5 && ~/.local/bin/brightness-control.sh+"), { repeating = true })
+hl.bind(mod .. " + SHIFT + UP", hl.dsp.exec_cmd("swayosd-client --brightness +5 && ~/.local/bin/brightness-control.sh+"), { repeating = true })
 
 -- Lower brightness by 5%
 
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "DOWN", hl.dsp.exec_cmd("swayosd-client --brightness -5 && ~/.local/bin/brightness-control.sh-"), { repeating = true })
+hl.bind(mod .. " + SHIFT + DOWN", hl.dsp.exec_cmd("swayosd-client --brightness -5 && ~/.local/bin/brightness-control.sh-"), { repeating = true })
 
 -- ==================================
 -- Toggle Animations On/Off (Mod + Shift + X)
 -- ==================================
 
-hl.bind(mod .. " + " .. "SHIFT" .. " + " .. "X", hl.dsp.exec_cmd("~/.local/bin/toggle-animations.sh"))
+hl.bind(mod .. " + SHIFT + X", hl.dsp.exec_cmd("~/.local/bin/toggle-animations.sh"))
 
 -- ==================================
 -- Wallpaper and Display settings
@@ -2638,7 +2634,7 @@ hl.on("hyprland.start", function()
     -- Uncomment line below to run Proton VPN in background on system start (make sure proton vpn is installed)
     hl.exec_cmd("protonvpn-app --start-minimized")
     -- Wallpaper
-hl.exec_cmd("swaybg -i /home/fatihthedev/Pictures/Wallpapers/dragon.jpg -m fill")
+    hl.exec_cmd("swaybg -i /home/fatihthedev/Pictures/Wallpapers/coffee-beans.jpg -m fill")
 end)
 HYPRCONF
 
