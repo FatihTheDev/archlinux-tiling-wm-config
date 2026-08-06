@@ -1489,8 +1489,7 @@ fi
 DIR="$HOME/Pictures/Wallpapers"
 LAST="$HOME/.cache/lastwallpaper"
 
-COMPOSITOR="hyprland"
-CONFIG_FILE="$HOME/.config/hypr/hyprland.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprland.lua"
 RELOAD_CMD="hyprctl reload"
 
 # Build list for wofi: simply list filenames
@@ -1504,23 +1503,20 @@ if [ -n "$CHOICE" ]; then
     echo "$FILE" > "$LAST"
     
     # --- IMMEDIATE WALLPAPER SETTING ---
-    swaybg -i -u "$FILE" -m fill &
+    pkill swaybg
+    swaybg -i "$FILE" -m fill &
     
     # --- CONFIGURATION UPDATE ---
-
-    BG_CONFIG_LINE="exec = swaybg -i $FILE -m fill"
+    NEW_LINE="hl.exec_cmd(\"swaybg -i $FILE -m fill\")"
     
-    # 1. Escape the file path for use in sed
-    ESCAPED_FILE=$(echo "$FILE" | sed 's/[\/&]/\\&/g')
-    ESCAPED_NEW_LINE="exec = swaybg -i ${ESCAPED_FILE} -m fill"
+    # 1. Escape the replacement line for sed
+    ESCAPED_NEW_LINE=$(echo "$NEW_LINE" | sed 's/[\/&]/\\&/g')
     
-    # 2. Check and replace (or append) the swaybg exec command
-    if grep -q "^exec = swaybg " "$CONFIG_FILE"; then
-        # Replace existing line using 'c\' (change line)
-        sed -i "/^exec = swaybg /c\\${ESCAPED_NEW_LINE}" "$CONFIG_FILE"
+    # 2. Replace or append the hl.exec_cmd line matching swaybg
+    if grep -q "hl\.exec_cmd.*swaybg" "$CONFIG_FILE"; then
+        sed -i "/hl\.exec_cmd.*swaybg/c\\${ESCAPED_NEW_LINE}" "$CONFIG_FILE"
     else
-        # Append to the config file
-        echo "${BG_CONFIG_LINE}" >> "$CONFIG_FILE"
+        echo "$NEW_LINE" >> "$CONFIG_FILE"
     fi
 
     # --- RELOAD COMPOSITOR ---
@@ -1852,7 +1848,7 @@ fi
 
 WAYBAR_CSS="$HOME/.config/waybar/style.css"
 WOFI_CSS="$HOME/.config/wofi/style.css"
-HYPR_CONF="$HOME/.config/hypr/hyprland.conf"
+HYPR_CONF="$HOME/.config/hypr/hyprland.lua"
 SWAYOSD_CSS="$HOME/.config/swayosd/style.css"
 
 DEFAULT_WALLPAPER_TELVA="$HOME/Pictures/Wallpapers/coffee-beans.jpg"
@@ -1860,9 +1856,7 @@ DEFAULT_WALLPAPER_MATRIX="$HOME/Pictures/Wallpapers/aurora.jpg"
 DEFAULT_WALLPAPER_DEFAULT="$HOME/Pictures/Wallpapers/dragon.jpg"
 LAST_WALLPAPER="$HOME/.cache/lastwallpaper"
 
-
 ZSH_SYNTAX_FILE="$HOME/.config/zsh_theme_sync"
-
 THEME_FILE="$HOME/.config/current_theme"
 
 CHOICE=$(printf "Default\nTelva\nMatrix" | wofi --dmenu --prompt "Select Theme")
@@ -1892,11 +1886,14 @@ set_wofi_highlight() {
     }' "$WOFI_CSS"
 }
 
-# --- Hyprland ---
+# --- Hyprland Lua Border ---
 set_hypr_border() {
     local c1="$1"
+    # Live update via runtime Lua API
+    hyprctl dispatch "hl.config({ general = { col = { active_border = 'rgba(${c1})' } } })" >/dev/null 2>&1
 
-    sed -i 's/^\([[:space:]]*\)col.active_border.*/\1col.active_border = rgba('"$c1"')/' "$HYPR_CONF"
+    # Persist in hyprland.lua file
+    sed -i 's/active_border = .*/active_border = "rgba('"$c1"')",/' "$HYPR_CONF"
 }
 
 # --- SwayOSD ---
@@ -1953,18 +1950,15 @@ sed -i '/\.widget-title button:active {/,/}/c\
 .widget-dnd .label {\
     color: '"$dnd_color"';\
     font-weight: 500;\
-}'
+}' "$HOME/.config/swaync/style.css"
 }
 
-# --- Dircolors (for ls and similar commands output color) --
+# --- Dircolors ---
 set_dircolors() {
     local color_code="$1"
     local dircolors_file="$HOME/.dircolors"
     
-    # Generate default if missing
     [ ! -f "$dircolors_file" ] && dircolors -p > "$dircolors_file"
-
-    # Replace the DIR line safely
     sed -i "s/^DIR[[:space:]].*/DIR ${color_code}/" "$dircolors_file"
 }
 
@@ -1988,18 +1982,20 @@ set_theme_wallpaper() {
     # Save as current wallpaper
     echo "$wallpaper" > "$LAST_WALLPAPER"
 
-    # Kill existing swaybg and set new wallpaper
-    swaybg -i -u "$wallpaper" -m fill &
+    # Kill existing swaybg and launch new process instantly
+    pkill swaybg >/dev/null 2>&1
+    swaybg -i "$wallpaper" -m fill &
 
-    # Update Hyprland config
-    ESCAPED_WALLPAPER=$(echo "$wallpaper" | sed 's/[\/&]/\\&/g')
-    if grep -q "^exec = swaybg " "$HYPR_CONF"; then
-        sed -i "/^exec = swaybg /c\\exec = swaybg -i ${ESCAPED_WALLPAPER} -m fill" "$HYPR_CONF"
+    # Update Hyprland Lua config file
+    local new_line="hl.exec_cmd(\"swaybg -i $wallpaper -m fill\")"
+    local escaped_new_line=$(echo "$new_line" | sed 's/[\/&]/\\&/g')
+
+    if grep -q "hl\.exec_cmd.*swaybg" "$HYPR_CONF"; then
+        sed -i "/hl\.exec_cmd.*swaybg/c\\${escaped_new_line}" "$HYPR_CONF"
     else
-        echo "exec = swaybg -i $wallpaper -m fill" >> "$HYPR_CONF"
+        echo "$new_line" >> "$HYPR_CONF"
     fi
 }
-
 
 # --- Theme selection ---
 case "$CHOICE" in
@@ -2043,7 +2039,7 @@ case "$CHOICE" in
         echo "Default" > "$THEME_FILE"
         pkill -SIGUSR2 waybar
         swaync-client -rs
-        hyprctl reload
+        hyprctl reload >/dev/null 2>&1
         ;;
 esac
 EOF
@@ -2055,39 +2051,39 @@ chmod +x "$TARGET_HOME/.local/bin/theme-switcher.sh"
 cat > "$TARGET_HOME/.local/bin/input-config.sh" <<'EOF'
 #!/bin/bash
 
-# If wofi is already opened, close it
+# If wofi is already running, toggle it off
 if pgrep -x wofi >/dev/null; then
     pkill -x wofi
     exit 0
 fi
 
-HYPR_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprland.conf"
+HYPR_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprland.lua"
 
 [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ] && notify-send "Error: Hyprland not detected." && exit 1
 [ ! -f "$HYPR_CONFIG" ] && notify-send "Error: Config not found at $HYPR_CONFIG" && exit 1
 
-SENSITIVITY=$(grep -E "^\s*sensitivity\s*=" "$HYPR_CONFIG" | tail -n 1 | sed -E 's/.*=\s*([-0-9.]+).*/\1/')
+# Extract sensitivity
+SENSITIVITY=$(grep -E "^\s*sensitivity\s*=" "$HYPR_CONFIG" | head -n 1 | sed -E 's/.*=\s*([-0-9.]+).*/\1/')
 [ -z "$SENSITIVITY" ] && SENSITIVITY="0.5"
 
-SCROLL_FACTOR=$(grep -E "^\s*scroll_factor\s*=" "$HYPR_CONFIG" | tail -n 1 | sed -E 's/.*=\s*([0-9.]+).*/\1/')
+# Extract root scroll_factor (ignoring touchpad level)
+SCROLL_FACTOR=$(sed -n '/input = {/,/touchpad = {/p' "$HYPR_CONFIG" | grep -E "^\s*scroll_factor\s*=" | head -n 1 | sed -E 's/.*=\s*([0-9.]+).*/\1/')
 [ -z "$SCROLL_FACTOR" ] && SCROLL_FACTOR="0.8"
 
-PROFILE=$(grep -E "^\s*accel_profile\s*=" "$HYPR_CONFIG" | tail -n 1 | sed -E 's/.*=\s*([a-zA-Z]+).*/\1/')
+# Extract accel_profile
+PROFILE=$(grep -E "^\s*accel_profile\s*=" "$HYPR_CONFIG" | head -n 1 | sed -E 's/.*=\s*["'\''\s]*([a-zA-Z]+)["'\''\s]*.*/\1/')
 [ -z "$PROFILE" ] && PROFILE="adaptive"
 
 OPTION=$(printf "Set Mouse Sensitivity\nSet Scroll Speed\nToggle Mouse Acceleration (flat / adaptive)" | wofi --dmenu --prompt "Option:")
 [ -z "$OPTION" ] && exit 0
 
-# Function to validate numeric input
 validate_number() {
     local input="$1"
     local min="$2"
     local max="$3"
-    # Check if input is a valid number (optional - sign, at least one digit, optional decimal part)
     if ! [[ "$input" =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
         return 1
     fi
-    # Check bounds using bc for floating point comparison
     if (( $(echo "$input < $min" | bc -l) )) || (( $(echo "$input > $max" | bc -l) )); then
         return 1
     fi
@@ -2105,10 +2101,18 @@ case "$OPTION" in
                 notify-send "Enter a number between -1.0 and 1.0"
             fi
         done
-        hyprctl keyword input:sensitivity "$SENS_VAL"
-        sed -i -E "s/^(\\s*sensitivity\\s*=\\s*)[-0-9.]+(\\s*#.*)?$/\\1$SENS_VAL\\2/" "$HYPR_CONFIG"
+        
+        # 1. Update persisted hyprland.lua file
+        sed -i -E "s/^(\s*sensitivity\s*=\s*)[-0-9.]+/\1$SENS_VAL/" "$HYPR_CONFIG"
+        
+        # 2. Live update runtime context via hl.config
+        hyprctl eval "hl.config({ input = { sensitivity = $SENS_VAL } })" >/dev/null 2>&1
+        
+        # 3. Force re-parse
+        hyprctl reload >/dev/null 2>&1
         notify-send "Mouse sensitivity set to $SENS_VAL"
         ;;
+
     "Set Scroll Speed")
         while true; do
             SCROLL_VAL=$(echo "$SCROLL_FACTOR" | wofi --dmenu --prompt "Set scroll speed (0.1 to 4.0):")
@@ -2119,18 +2123,30 @@ case "$OPTION" in
                 notify-send "Enter a number between 0.1 and 4.0"
             fi
         done
-        hyprctl keyword input:scroll_factor "$SCROLL_VAL"
-        hyprctl keyword input:touchpad:scroll_factor "$SCROLL_VAL"
-        sed -i -E "s/^(\\s*scroll_factor\\s*=\\s*)[0-9.]+(\\s*#.*)?$/\\1$SCROLL_VAL\\2/" "$HYPR_CONFIG"
-        sed -i -E "/touchpad\\s*{/,/}/ s/^(\\s*scroll_factor\\s*=\\s*)[0-9.]+(\\s*#.*)?$/\\1$SCROLL_VAL\\2/" "$HYPR_CONFIG"
+        
+        # 1. Update persisted hyprland.lua file (updates both input and touchpad scroll factors)
+        sed -i -E "s/^(\s*scroll_factor\s*=\s*)[0-9.]+/\1$SCROLL_VAL/" "$HYPR_CONFIG"
+        
+        # 2. Live update runtime context via hl.config
+        hyprctl eval "hl.config({ input = { scroll_factor = $SCROLL_VAL, touchpad = { scroll_factor = $SCROLL_VAL } } })" >/dev/null 2>&1
+        
+        # 3. Force re-parse
+        hyprctl reload >/dev/null 2>&1
         notify-send "Scroll speed set to $SCROLL_VAL"
         ;;
+
     "Toggle Mouse Acceleration (flat / adaptive)")
         NEW_PROFILE="flat"
         [ "$PROFILE" = "flat" ] && NEW_PROFILE="adaptive"
-        hyprctl keyword input:accel_profile "$NEW_PROFILE"
-        hyprctl keyword input:touchpad:accel_profile "$NEW_PROFILE"
-        sed -i -E "s/^(\\s*accel_profile\\s*=\\s*)[a-zA-Z]+(\\s*#.*)?$/\\1$NEW_PROFILE\\2/" "$HYPR_CONFIG"
+        
+        # 1. Update persisted hyprland.lua file
+        sed -i -E "s/^(\s*accel_profile\s*=\s*)[\"'][a-zA-Z]+[\"']/\1\"$NEW_PROFILE\"/" "$HYPR_CONFIG"
+        
+        # 2. Live update runtime context via hl.config
+        hyprctl eval "hl.config({ input = { accel_profile = '$NEW_PROFILE' } })" >/dev/null 2>&1
+        
+        # 3. Force re-parse
+        hyprctl reload >/dev/null 2>&1
         notify-send "Mouse acceleration set to $NEW_PROFILE"
         ;;
 esac
@@ -2138,10 +2154,6 @@ EOF
 chmod +x "$TARGET_HOME/.local/bin/input-config.sh"
 
 cat > "$TARGET_HOME/.config/hypr/hyprland.lua" <<'HYPRCONF'
--- Generated by hyprconf2lua v1.4.0
--- https://github.com/Prateek-squadron/hyprconf2lua
--- Manual review may be needed for complex directives
-
 ---@module 'hl'
 
 -- ================================
@@ -2625,13 +2637,15 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE")
     -- Uncomment line below to run Proton VPN in background on system start (make sure proton vpn is installed)
     hl.exec_cmd("protonvpn-app --start-minimized")
+    -- Wallpaper
+hl.exec_cmd("swaybg -i /home/fatihthedev/Pictures/Wallpapers/dragon.jpg -m fill")
 end)
 HYPRCONF
 
 cat > "$TARGET_HOME/.config/hypr/cheatsheet.txt" <<'EOF'
 
                                    HYPRLAND WINDOW MANAGER KEYBINDINGS CHEATSHEET  
-     (Quick reference for essential Hyprland controls — you can modify all bindings in ~/.config/hypr/hyprland.conf file.)  
+     (Quick reference for essential Hyprland controls — you can modify all bindings in ~/.config/hypr/hyprland.lua file.)  
              (Mod = your main modifier key — it is Alt by default, but you can change it in the config file.)
 
                     ================================================================================
