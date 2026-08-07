@@ -1537,33 +1537,44 @@ if pgrep -x wofi >/dev/null; then
     exit 0
 fi
 
-COMPOSITOR="hyprland"
-CONFIG="$HOME/.config/hypr/hyprland.conf"
+HYPR_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprland.lua"
 
-# STEP 1: Get monitor outputs.
+[ -z "$HYPRLAND_INSTANCE_SIGNATURE" ] && notify-send "Error: Hyprland not detected." && exit 1
+[ ! -f "$HYPR_CONFIG" ] && notify-send "Error: Config not found at $HYPR_CONFIG" && exit 1
+
+# STEP 1: Get monitor outputs
 outputs=$(hyprctl -j monitors | jq -r '.[].name')
-
-[ -z "$outputs" ] && echo "ERROR: No monitor outputs detected." && exit 1
+[ -z "$outputs" ] && notify-send "ERROR: No monitor outputs detected." && exit 1
 
 chosen_output=$(echo "$outputs" | wofi --dmenu --prompt "Select monitor:")
 [ -z "$chosen_output" ] && exit 0
 
-# STEP 2: Get modes. Uses .availableModes[] field.
+# STEP 2: Get available modes for selected monitor
 modes=$(hyprctl -j monitors | jq -r --arg out "$chosen_output" '.[] | select(.name == $out) | .availableModes[]')
+[ -z "$modes" ] && notify-send "ERROR: No modes found for $chosen_output." && exit 1
 
-[ -z "$modes" ] && echo "ERROR: No modes found for $chosen_output." && exit 1
-
-# STEP 3: Second wofi prompt
-chosen_mode=$(echo "$modes" | wofi --dmenu --prompt "Select resolution:")
+# STEP 3: Prompt for mode selection
+chosen_mode=$(echo "$modes" | wofi --dmenu --prompt "Select resolution & refresh rate:")
 [ -z "$chosen_mode" ] && exit 0
 
-# Apply the setting: monitor name, mode, position (auto), scale (1)
-hyprctl keyword monitor "$chosen_output,$chosen_mode,auto,1"
+# STEP 4: Apply live runtime change
+hyprctl dispatch "hl.dsp.monitor('$chosen_output, $chosen_mode, auto, 1')" >/dev/null 2>&1
 
-confirm=$(echo -e "yes\nno" | wofi --dmenu --prompt "Save to hyprland config?")
+confirm=$(echo -e "yes\nno" | wofi --dmenu --prompt "Save to hyprland.lua?")
 if [ "$confirm" == "yes" ]; then
-    sed -i "/^monitor=$chosen_output/d" "$CONFIG"
-    echo "monitor=$chosen_output, $chosen_mode, 0x0, 1" >> "$CONFIG"
+    # Construct the Lua function call string
+    LUA_MONITOR_BLOCK="hl.monitor({\n  output = \"$chosen_output\",\n  mode = \"$chosen_mode\",\n  position = \"0x0\",\n  scale = 1,\n})"
+
+    # Remove existing hl.monitor(...) block for this specific output if it exists
+    # Matches: hl.monitor({ ... output = "chosen_output" ... })
+    perl -i -0777 -pe "s/hl\.monitor\(\s*\{\s*output\s*=\s*\"$chosen_output\".*?\}\s*\)\n?//s" "$HYPR_CONFIG"
+
+    # Append the clean Lua function block to hyprland.lua
+    echo -e "\n$LUA_MONITOR_BLOCK" >> "$HYPR_CONFIG"
+
+    # Reload Hyprland to lock in the Lua state
+    hyprctl reload >/dev/null 2>&1
+    notify-send "Saved monitor config for $chosen_output"
 fi
 EOF
 chmod +x "$TARGET_HOME/.local/bin/display-settings.sh"
