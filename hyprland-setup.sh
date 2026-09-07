@@ -1035,21 +1035,20 @@ input-field {
     valign = center
 
     outline_thickness = 2
-    inner_color = 0xDD737373       # Gray background
-    outer_color = 0xDD434343       # Lighter gray border
+    inner_color = rgba(115, 115, 115, 0.87)
+    outer_color = rgba(67, 67, 67, 0.87)
 
     placeholder_text = Enter Password...
 
-    fail_color = 0xFFA00000         # muted red for filed outline on failure
-    check_color = 0xFFCCCC00        # yellow for field outline on pending
-
-    fail_text =
+    fail_color = rgba(160, 0, 0, 1.0)
+    check_color = rgba(204, 204, 0, 1.0)
 }
 
 label {
-    text = cmd[update:1000] echo "<b>$(date +'%H:%M')</b>"
+    text = <b>$TIME</b>
     font_size = 20
-    color = 0xFFFFFFFF
+    font_family = Sans
+    color = rgba(255, 255, 255, 1.0)
     position = 0, -180
     halign = center
     valign = center
