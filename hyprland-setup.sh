@@ -437,16 +437,14 @@ rm -f /tmp/sddm-theme.sh
 # Modifying preferences for Librewolf browser
 # -------------------------------------------
 # 1. Define paths
-FP_PATH="/usr/lib/librewolf"
-CFG_PATH="$FP_PATH/librewolf.cfg"
-PREF_PATH="$FP_PATH/defaults/pref"
-ACFILE="$PREF_PATH/autoconfig.js"
+OVERRIDE_DIR="$HOME/.config/librewolf/librewolf"
+OVERRIDE_FILE="$OVERRIDE_DIR/librewolf.overrides.cfg"
 
 # 2. Ensure directory exists
-sudo mkdir -p "$PREF_PATH"
+mkdir -p "$OVERRIDE_DIR"
 
-# 3. Create main autoconfig file
-sudo tee "$CFG_PATH" > /dev/null <<'EOF'
+# 3. Create overrides file
+cat > "$OVERRIDE_FILE" <<'EOF'
 // LibreWolf AutoConfig
 // This file is loaded at Librewolf startup. Do not leave blank lines above this header.
 
@@ -530,17 +528,7 @@ pref("dom.security.https_only_mode", false);
 pref("dom.security.https_only_mode_pbm", true);
 EOF
 
-echo "[+] Created $CFG_PATH"
-
-# 4. Create autoconfig loader
-sudo tee "$ACFILE" > /dev/null <<'EOF'
-pref("general.config.filename", "librewolf.cfg");
-pref("general.config.obscure_value", 0);
-EOF
-
-echo "[+] Created $ACFILE"
-
-echo "✅ LibreWolf autoconfig successfully installed"
+echo "[+] Created $OVERRIDE_FILE"
 
 
 # -------------------------------------------------------------------
