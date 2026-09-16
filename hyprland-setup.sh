@@ -451,7 +451,7 @@ cat > "$OVERRIDE_FILE" <<'EOF'
 // ----------------- Fingerprinting protection (granular control) ----------------
 defaultPref("privacy.resistFingerprinting", false);
 defaultPref("privacy.fingerprintingProtection", true);
-defaultPref("privacy.fingerprintingProtection.overrides", "+AllTargets,-CSSPrefersColorScheme");   
+defaultPref("privacy.fingerprintingProtection.overrides", "+AllTargets,-CSSPrefersColorScheme");
 lockPref("dom.gamepad.enabled", false);
 lockPref("dom.netinfo.enabled", false);
 // lockPref("dom.enable_performance", false);
@@ -464,7 +464,7 @@ lockPref("network.http.referer.XOriginPolicy", 2);
 // ----------------- Profiles + Accounts -----------------
 defaultPref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 defaultPref("browser.profiles.enabled", true);
-defaultPref("identity.fxaccounts.enabled", true);  // enables Firefox Sync UI
+defaultPref("identity.fxaccounts.enabled", true); // enables Firefox Sync UI
 
 // ----------------- Set new tab page to blank instead of homepage ----------------
 defaultPref("browser.newtabpage.enabled", false);
