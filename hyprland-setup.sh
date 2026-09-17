@@ -2220,7 +2220,7 @@ hl.config({
         layout = "dwindle",
         -- Active window border color
         col = {
-            active_border = "rgba(a080ccee)",
+            active_border = "rgba(80b8f0ee)",
         },
     },
 })
