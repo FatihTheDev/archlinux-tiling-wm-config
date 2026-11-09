@@ -1337,10 +1337,15 @@ get_real_status() {
 case "$1" in
     "toggle")
         if pgrep -x hypridle >/dev/null; then
-            pkill hypridle
+            pkill -x hypridle
+            # Wait briefly so pgrep doesn't catch the dying process
+            while pgrep -x hypridle >/dev/null; do sleep 0.05; done
         else
             hypridle >/dev/null 2>&1 & disown
+            sleep 0.1
         fi
+
+        pkill -RTMIN+8 waybar
 
         # Update module immediately
         get_real_status
